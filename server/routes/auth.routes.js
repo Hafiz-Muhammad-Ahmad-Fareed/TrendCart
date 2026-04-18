@@ -28,7 +28,8 @@ router.get("/me", requireClerkAuth, async (req, res) => {
       role: localUser.role || null,
     };
 
-    return res.status(200).json({ auth: req.user, user: safeUser });
+    // return res.status(200).json({ auth: req.user, user: safeUser });
+    return res.status(200).json({ user: safeUser });
   } catch (err) {
     return res
       .status(500)

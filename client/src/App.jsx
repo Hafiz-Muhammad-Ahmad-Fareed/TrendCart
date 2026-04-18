@@ -16,14 +16,6 @@ function App() {
     }
   }, [userId, user]);
 
-  useEffect(() => {
-    console.log("userId:", userId);
-  }, [userId]);
-
-  useEffect(() => {
-    console.log("user:", user);
-  }, [user]);
-
   return (
     <div className="min-h-screen bg-gray-900 text-white relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">

@@ -9,6 +9,27 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
+axiosInstance.interceptors.request.use(
+  async (config) => {
+    try {
+      const clerkSession = window.Clerk?.session;
+
+      if (clerkSession) {
+        const token = await clerkSession.getToken();
+
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to attach Clerk token:", err.message);
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
