@@ -267,3 +267,7 @@
 2026-04-18 22:39:46 [info]: POST /api/clerk/webhook 200 - 31ms - IP: ::1
 2026-04-18 22:39:46 [info]: OPTIONS /api/auth/me 204 - 1ms - IP: ::1
 2026-04-18 22:39:47 [info]: GET /api/auth/me 200 - 590ms - IP: ::1
+2026-04-18 22:40:42 [info]: OPTIONS /api/auth/me 204 - 8ms - IP: ::1
+2026-04-18 22:40:42 [info]: GET /api/auth/me 304 - 597ms - IP: ::1
+2026-04-18 22:40:45 [info]: OPTIONS /api/auth/me 204 - 1ms - IP: ::1
+2026-04-18 22:40:45 [info]: GET /api/auth/me 304 - 8ms - IP: ::1
