@@ -1,8 +1,10 @@
 import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Show, SignInButton, UserButton } from "@clerk/react";
+import useUserStore from "../stores/useUserStore";
 
 const Navbar = () => {
+  const { user } = useUserStore();
   return (
     <header className="fixed top-0 left-0 w-full bg-gray-900 bg-opacity-90 backdrop-blur-md shadow-lg z-40 transition-all duration-300 border-b border-emerald-800">
       <div className="container mx-auto px-4 py-3">
@@ -15,20 +17,32 @@ const Navbar = () => {
           </Link>
 
           <nav className="flex items-center gap-6">
-            <Link
-              to="/"
-              className="text-gray-300 hover:text-emerald-400 transition duration-300 ease-in-out"
-            >
-              Home
-            </Link>
+            {user?.role === "admin" ? (
+              <>
+                <Link
+                  to="/admin-dashboard"
+                  className="text-gray-300 hover:text-emerald-400 transition duration-300 ease-in-out"
+                >
+                  Dashboard
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/"
+                  className="text-gray-300 hover:text-emerald-400 transition duration-300 ease-in-out"
+                >
+                  Home
+                </Link>
 
-            <Link
-              to="/cart"
-              className="text-gray-300 hover:text-emerald-400 transition"
-            >
-              <ShoppingCart size={20} />
-            </Link>
-
+                <Link
+                  to="/cart"
+                  className="text-gray-300 hover:text-emerald-400 transition"
+                >
+                  <ShoppingCart size={20} />
+                </Link>
+              </>
+            )}
             <Show when="signed-out">
               <SignInButton mode="modal">
                 <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition duration-300 shadow-md cursor-pointer">

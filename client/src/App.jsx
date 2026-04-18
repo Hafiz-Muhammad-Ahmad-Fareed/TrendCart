@@ -1,8 +1,10 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useAuth } from "@clerk/react";
 import HomePage from "./pages/HomePage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
 import Navbar from "./components/Navbar";
+import AdminRoute from "./components/AdminRoute";
 import useUserStore from "./stores/useUserStore";
 import { useEffect } from "react";
 
@@ -27,7 +29,27 @@ function App() {
       <div className="relative z-50 pt-20">
         <Navbar />
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          {/* If admin, redirect from home to dashboard */}
+          <Route
+            path="/"
+            element={
+              user?.role === "admin" ? (
+                <Navigate to="/admin-dashboard" replace />
+              ) : (
+                <HomePage />
+              )
+            }
+          />
+
+          {/* Admin-only route */}
+          <Route
+            path="/admin-dashboard"
+            element={
+              <AdminRoute>
+                <AdminDashboardPage />
+              </AdminRoute>
+            }
+          />
         </Routes>
       </div>
       <Toaster />
