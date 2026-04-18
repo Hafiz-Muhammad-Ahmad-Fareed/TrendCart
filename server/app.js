@@ -5,7 +5,7 @@ import { clerkMiddleware } from "@clerk/express";
 import requestLogger from "./middlewares/request_logger.middleware.js";
 import errorHandlerMiddleware from "./middlewares/error_handler.middleware.js";
 import logger from "./config/winston.config.js";
-import webhookRoutes from "./routes/webhook.routes.js";
+import clerkRoutes from "./routes/clerk.routes.js";
 
 const app = express();
 
@@ -14,9 +14,9 @@ app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 
 app.use(
-  "/api/webhooks",
+  "/api/clerk/webhook",
   express.raw({ type: "application/json" }),
-  webhookRoutes,
+  clerkRoutes,
 );
 
 app.use(

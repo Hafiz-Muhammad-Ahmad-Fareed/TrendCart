@@ -1,85 +1,137 @@
-import User from "../db/models/User.model.js";
+import { Webhook } from "svix";
+import * as webhookRepo from "../repositories/clerk.repository.js";
 
-export const syncUserToDatabase = async (clerkUser) => {
+const syncUserToDatabase = async (clerkUser) => {
   try {
     if (!clerkUser?.id) {
       throw new Error("Invalid Clerk user data - missing id");
     }
 
-    let email = null;
-
-    if (clerkUser?.email_addresses?.[0]?.email_address) {
-      email = clerkUser.email_addresses[0].email_address;
-    }
-
-    const existingUser = await User.findOne({ clerkId: clerkUser.id });
-
-    if (existingUser) {
-      if (email && email !== existingUser.email) {
-        const emailExists = await User.findOne({
-          email: email.toLowerCase(),
-          clerkId: { $ne: clerkUser.id },
-        });
-
-        if (emailExists) {
-          console.warn(
-            `⚠️ Email ${email} already exists for another user. Skipping email update.`,
-          );
-        } else {
-          existingUser.email = email.toLowerCase();
-        }
-      }
-
-      existingUser.firstName = clerkUser.first_name || "";
-      existingUser.lastName = clerkUser.last_name || "";
-      existingUser.fullName = `${clerkUser.first_name || ""} ${
+    const userData = {
+      clerkId: clerkUser.id,
+      email: clerkUser.email_addresses[0].email_address || "",
+      firstName: clerkUser.first_name || "",
+      lastName: clerkUser.last_name || "",
+      fullName: `${clerkUser.first_name || ""} ${
         clerkUser.last_name || ""
-      }`.trim();
-      existingUser.profileImage = clerkUser.profile_image_url || "";
-
-      await existingUser.save();
-      return existingUser;
-    } else {
-      if (email) {
-        const emailExists = await User.findOne({
-          email: email.toLowerCase(),
-        });
-
-        if (emailExists) {
-          throw new Error(
-            `Email ${email} already exists in database for another user`,
-          );
-        }
-      }
-
-      const userData = {
-        clerkId: clerkUser.id,
-        email: email?.toLowerCase() || null,
-        firstName: clerkUser.first_name || "",
-        lastName: clerkUser.last_name || "",
-        fullName: `${clerkUser.first_name || ""} ${
-          clerkUser.last_name || ""
-        }`.trim(),
-        profileImage: clerkUser.profile_image_url || "",
-      };
-
-      const user = await User.create(userData);
-      return user;
-    }
+      }`.trim(),
+      profileImage: clerkUser.profile_image_url || "",
+    };
+    const user = await webhookRepo.upsertUser(clerkUser.id, userData);
+    return user;
   } catch (error) {
     console.error("❌ Error syncing user to database:", error.message);
     throw error;
   }
 };
 
-export const deleteUser = async (clerkId) => {
+const syncUpdatedUserToDatabase = async (clerkUser) => {
+  try {
+    if (!clerkUser?.id) {
+      throw new Error("Invalid Clerk user data - missing id");
+    }
+
+    const updateData = {
+      email: clerkUser.email_addresses?.[0]?.email_address || "",
+      firstName: clerkUser.first_name || "",
+      lastName: clerkUser.last_name || "",
+      fullName: `${clerkUser.first_name || ""} ${
+        clerkUser.last_name || ""
+      }`.trim(),
+      profileImage: clerkUser.profile_image_url || "",
+    };
+
+    const user = await webhookRepo.updateUserByClerkId(
+      clerkUser.id,
+      updateData,
+    );
+
+    if (!user) {
+      throw new Error("User not found for update");
+    }
+
+    return user;
+  } catch (error) {
+    console.error("❌ Error syncing updated user to database:", error.message);
+    throw error;
+  }
+};
+
+const deleteUser = async (clerkId) => {
   try {
     if (!clerkId) {
       throw new Error("clerkId is required to delete user");
     }
-    await User.findOneAndDelete({ clerkId });
+    await webhookRepo.deleteUserByClerkId(clerkId);
   } catch (error) {
     console.error("❌ Error deleting user from database:", error.message);
     throw error;
+  }
+};
+
+export const clerkUserManagement = async (req, res) => {
+  const CLERK_WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
+
+  if (!CLERK_WEBHOOK_SECRET) {
+    return res.status(500).json({
+      error: "CLERK_WEBHOOK_SECRET is not configured",
+    });
+  }
+
+  try {
+    // Get the request body - should be raw when using express.raw()
+    let body;
+    if (Buffer.isBuffer(req.body)) {
+      body = req.body.toString("utf8");
+    } else if (typeof req.body === "string") {
+      body = req.body;
+    } else {
+      body = JSON.stringify(req.body);
+    }
+
+    // Get headers
+    const headers = {
+      "svix-id": req.headers["svix-id"],
+      "svix-timestamp": req.headers["svix-timestamp"],
+      "svix-signature": req.headers["svix-signature"],
+    };
+
+    // Verify the webhook signature
+    const wh = new Webhook(CLERK_WEBHOOK_SECRET);
+    let evt;
+
+    try {
+      evt = wh.verify(body, headers);
+    } catch (err) {
+      return res.status(400).json({ error: "Webhook verification failed" });
+    }
+
+    // Handle different Clerk events
+    const eventType = evt.type;
+
+    switch (eventType) {
+      case "user.created":
+        await syncUserToDatabase(evt.data);
+        break;
+
+      case "user.updated":
+        await syncUpdatedUserToDatabase(evt.data);
+        break;
+
+      case "user.deleted":
+        await deleteUser(evt.data.id);
+        break;
+
+      default:
+        console.log(`⚠️ Unhandled event type: ${eventType}`);
+    }
+
+    res.status(200).json({ success: true, message: "Event processed" });
+  } catch (error) {
+    console.error("❌ Error processing webhook:", error);
+    res.status(500).json({
+      error: "Error processing webhook",
+      details: error.message,
+    });
   }
 };
