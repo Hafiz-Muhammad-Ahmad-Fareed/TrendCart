@@ -1,5 +1,11 @@
 import { useEffect } from "react";
-import { LayoutDashboard, Package, Tag, Users } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  Tag,
+  Users,
+  ShoppingCart,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import useAdminStore from "../stores/useAdminStore";
 
@@ -24,9 +30,9 @@ const AdminDashboardPage = () => {
       color: "from-emerald-500 to-teal-600",
     },
     {
-      label: "Active Products",
-      value: counts.activeProducts,
-      icon: Package,
+      label: "Total Orders",
+      value: "0",
+      icon: ShoppingCart,
       color: "from-blue-500 to-indigo-600",
     },
     {
@@ -62,7 +68,9 @@ const AdminDashboardPage = () => {
                 <h3 className="text-sm font-medium text-gray-400">
                   {stat.label}
                 </h3>
-                <div className={`rounded-lg bg-gradient-to-r p-2 ${stat.color}`}>
+                <div
+                  className={`rounded-lg bg-gradient-to-r p-2 ${stat.color}`}
+                >
                   <stat.icon size={20} className="text-white" />
                 </div>
               </div>
@@ -92,14 +100,24 @@ const AdminDashboardPage = () => {
               <Package size={18} />
               Manage Products
             </Link>
-            <div className="flex items-center justify-center gap-3 rounded-lg border border-blue-500/30 bg-blue-600/20 px-5 py-3 text-blue-200">
+            {/* <div className="flex items-center justify-center gap-3 rounded-lg border border-blue-500/30 bg-blue-600/20 px-5 py-3 text-blue-200">
               <Package size={18} />
               {isDashboardLoading ? "Refreshing..." : "Catalog synced"}
-            </div>
-            <div className="flex items-center justify-center gap-3 rounded-lg border border-purple-500/30 bg-purple-600/20 px-5 py-3 text-purple-200">
+            </div> */}
+            <Link
+              to="/admin-dashboard/orders"
+              className="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg transition duration-300 cursor-pointer"
+            >
+              <ShoppingCart size={18} />
+              Manage Orders
+            </Link>
+            <Link
+              to="/admin-dashboard/users"
+              className="flex items-center justify-center gap-3 rounded-lg bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 transition duration-300"
+            >
               <Users size={18} />
-              {counts.users} synced users
-            </div>
+              Manage users
+            </Link>
           </div>
         </div>
       </div>
