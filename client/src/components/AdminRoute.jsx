@@ -1,20 +1,16 @@
+import { useAuth } from "@clerk/react";
 import { Navigate } from "react-router-dom";
 import useUserStore from "../stores/useUserStore";
 
-/**
- * Protects admin-only routes.
- * - If user data is still loading → shows nothing (or a loader)
- * - If user is not admin → redirects to home
- * - If user is admin → renders the child route
- */
 const AdminRoute = ({ children }) => {
-  const { user } = useUserStore();
+  const { userId, isLoaded } = useAuth();
+  const { user, isLoading, hasFetched } = useUserStore();
 
-  if (!user) {
-    return null; // still loading user data
+  if (!isLoaded || (userId && (isLoading || !hasFetched))) {
+    return null;
   }
 
-  if (user.role !== "admin") {
+  if (!userId || user?.role !== "admin") {
     return <Navigate to="/" replace />;
   }
 

@@ -7,6 +7,8 @@ import errorHandlerMiddleware from "./middlewares/error_handler.middleware.js";
 import logger from "./config/winston.config.js";
 import clerkRoutes from "./routes/clerk.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+import catalogRoutes from "./routes/catalog.routes.js";
 
 const app = express();
 
@@ -37,6 +39,8 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({ message: "Server is running." });
 });
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api", catalogRoutes);
 app.use(errorHandlerMiddleware(logger));
 
 export default app;

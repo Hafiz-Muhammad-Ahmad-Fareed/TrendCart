@@ -1,35 +1,37 @@
-import {
-  Tag,
-  LayoutDashboard,
-  Package,
-  ShoppingCart,
-  Users,
-} from "lucide-react";
+import { useEffect } from "react";
+import { LayoutDashboard, Package, Tag, Users } from "lucide-react";
+import { Link } from "react-router-dom";
+import useAdminStore from "../stores/useAdminStore";
 
 const AdminDashboardPage = () => {
-  // Placeholder stats — replace with real API data later
+  const { counts, isDashboardLoading, fetchDashboard } = useAdminStore();
+
+  useEffect(() => {
+    fetchDashboard();
+  }, [fetchDashboard]);
+
   const stats = [
     {
       label: "Total Categories",
-      value: "0",
+      value: counts.categories,
       icon: Tag,
       color: "from-amber-500 to-orange-600",
     },
     {
       label: "Total Products",
-      value: "0",
+      value: counts.products,
       icon: Package,
       color: "from-emerald-500 to-teal-600",
     },
     {
-      label: "Total Orders",
-      value: "0",
-      icon: ShoppingCart,
+      label: "Active Products",
+      value: counts.activeProducts,
+      icon: Package,
       color: "from-blue-500 to-indigo-600",
     },
     {
       label: "Total Users",
-      value: "0",
+      value: counts.users,
       icon: Users,
       color: "from-purple-500 to-pink-600",
     },
@@ -37,58 +39,67 @@ const AdminDashboardPage = () => {
 
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex items-center gap-3 mb-8">
           <LayoutDashboard className="text-emerald-400" size={32} />
-          <h1 className="text-4xl font-bold text-emerald-400">
-            Admin Dashboard
-          </h1>
+          <div>
+            <h2 className="text-4xl font-bold text-emerald-400">
+              Admin Dashboard
+            </h2>
+            <p className="mt-2 text-sm text-gray-400">
+              Track how much of the catalog is live and where to manage it next.
+            </p>
+          </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 gap-6 mb-12 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="bg-gray-800 bg-opacity-50 backdrop-blur-md rounded-xl p-6 border border-gray-700 hover:border-emerald-500/50 transition-all duration-300"
+              className="rounded-xl border border-gray-700 bg-gray-800/50 p-6 backdrop-blur-md transition-all duration-300 hover:border-emerald-500/50"
             >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-400 text-sm font-medium">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-sm font-medium text-gray-400">
                   {stat.label}
                 </h3>
-                <div
-                  className={`p-2 rounded-lg bg-gradient-to-r ${stat.color}`}
-                >
+                <div className={`rounded-lg bg-gradient-to-r p-2 ${stat.color}`}>
                   <stat.icon size={20} className="text-white" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-white">{stat.value}</p>
+              <p className="text-3xl font-bold text-white">
+                {isDashboardLoading ? "..." : stat.value}
+              </p>
             </div>
           ))}
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-gray-800 bg-opacity-50 backdrop-blur-md rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold text-white mb-4">
+        <div className="rounded-xl border border-gray-700 bg-gray-800/50 p-6 backdrop-blur-md">
+          <h2 className="mb-4 text-xl font-semibold text-white">
             Quick Actions
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <button className="flex items-center gap-3 bg-amber-600 hover:bg-amber-700 text-white px-5 py-3 rounded-lg transition duration-300 cursor-pointer">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Link
+              to="/admin-dashboard/categories"
+              className="flex items-center justify-center gap-3 rounded-lg bg-amber-600 px-5 py-3 text-white transition duration-300 hover:bg-amber-700"
+            >
               <Tag size={18} />
-              Add New Category
-            </button>
-            <button className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-lg transition duration-300 cursor-pointer">
+              Manage Categories
+            </Link>
+            <Link
+              to="/admin-dashboard/products"
+              className="flex items-center justify-center gap-3 rounded-lg bg-emerald-600 px-5 py-3 text-white transition duration-300 hover:bg-emerald-700"
+            >
               <Package size={18} />
-              Add New Product
-            </button>
-            <button className="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg transition duration-300 cursor-pointer">
-              <ShoppingCart size={18} />
-              View Orders
-            </button>
-            <button className="flex items-center gap-3 bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 rounded-lg transition duration-300 cursor-pointer">
+              Manage Products
+            </Link>
+            <div className="flex items-center justify-center gap-3 rounded-lg border border-blue-500/30 bg-blue-600/20 px-5 py-3 text-blue-200">
+              <Package size={18} />
+              {isDashboardLoading ? "Refreshing..." : "Catalog synced"}
+            </div>
+            <div className="flex items-center justify-center gap-3 rounded-lg border border-purple-500/30 bg-purple-600/20 px-5 py-3 text-purple-200">
               <Users size={18} />
-              Manage Users
-            </button>
+              {counts.users} synced users
+            </div>
           </div>
         </div>
       </div>
