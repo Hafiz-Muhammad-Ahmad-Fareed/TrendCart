@@ -38,7 +38,7 @@ const Navbar = () => {
             </Show>
 
             <Show when="signed-in">
-              <div className="flex items-center mt-1">
+              <div className="flex items-center mt-1 gap-3">
                 <UserButton afterSignOutUrl="/" />
               </div>
             </Show>

@@ -1,13 +1,29 @@
 import { Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-
+import { useAuth } from "@clerk/react";
 import HomePage from "./pages/HomePage";
 import Navbar from "./components/Navbar";
-import { useAuth } from "@clerk/react";
+import useUserStore from "./stores/useUserStore";
+import { useEffect } from "react";
 
 function App() {
   const { userId } = useAuth();
-  console.log(userId);
+  const { user, fetchUser } = useUserStore();
+
+  useEffect(() => {
+    if (userId && !user) {
+      fetchUser();
+    }
+  }, [userId, user]);
+
+  useEffect(() => {
+    console.log("userId:", userId);
+  }, [userId]);
+
+  useEffect(() => {
+    console.log("user:", user);
+  }, [user]);
+
   return (
     <div className="min-h-screen bg-gray-900 text-white relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
