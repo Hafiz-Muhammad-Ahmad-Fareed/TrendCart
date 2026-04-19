@@ -1,0 +1,30 @@
+import Order from "../db/models/Order.model.js";
+
+const orderRepository = {
+  async create(data) {
+    return Order.create(data);
+  },
+
+  async findBySessionId(sessionId) {
+    return Order.findOne({ stripeSessionId: sessionId });
+  },
+
+  async updateById(id, data) {
+    return Order.findByIdAndUpdate(id, data, { new: true }).lean();
+  },
+
+  async findByUserId(userId) {
+    return Order.find({ user: userId }).sort({ createdAt: -1 }).lean();
+  },
+  async findAll() {
+    return Order.find()
+      .populate("user", "fullName email")
+      .sort({ createdAt: -1 })
+      .lean();
+  },
+  async findById(id) {
+    return Order.findById(id).populate("user", "fullName email").lean();
+  },
+};
+
+export default orderRepository;

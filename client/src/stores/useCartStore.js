@@ -59,6 +59,17 @@ const useCartStore = create((set, get) => ({
       toast.error(error.response?.data?.message || "Failed to clear cart");
     }
   },
+
+  checkout: async () => {
+    try {
+      const res = await axiosInstance.post("/orders/checkout-session");
+      if (res.data.url) {
+        window.location.href = res.data.url;
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Checkout failed");
+    }
+  },
 }));
 
 export default useCartStore;

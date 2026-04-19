@@ -10,8 +10,11 @@ import AdminUsersPage from "./pages/AdminUsersPage";
 import CategoryPage from "./pages/CategoryPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import CartPage from "./pages/CartPage";
+import OrdersPage from "./pages/OrdersPage";
+import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
 import Navbar from "./components/Navbar";
 import AdminRoute from "./components/AdminRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./components/AdminLayout";
 import useUserStore from "./stores/useUserStore";
 import useCartStore from "./stores/useCartStore";
@@ -60,7 +63,9 @@ function App() {
           />
           <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/product/:slug" element={<ProductDetailsPage />} />
-          <Route path="/cart" element={<CartPage />} />
+          <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+          <Route path="/checkout-success" element={<ProtectedRoute><CheckoutSuccessPage /></ProtectedRoute>} />
           <Route
             path="/admin-dashboard"
             element={

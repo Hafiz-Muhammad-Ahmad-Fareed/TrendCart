@@ -3,7 +3,8 @@ import { ShoppingCart, Minus, Plus, Trash2, ArrowRight } from "lucide-react";
 import useCartStore from "../stores/useCartStore";
 
 const CartPage = () => {
-  const { cart, updateQuantity, removeFromCart, isCartLoading } = useCartStore();
+  const { cart, updateQuantity, removeFromCart, isCartLoading, checkout } =
+    useCartStore();
 
   const cartItems = cart?.items || [];
   const subtotal = cartItems.reduce(
@@ -145,7 +146,10 @@ const CartPage = () => {
                 <span className="text-emerald-400">${subtotal.toFixed(2)}</span>
               </div>
 
-              <button className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-4 font-bold text-white transition hover:bg-emerald-500">
+              <button
+                onClick={checkout}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-4 font-bold text-white transition hover:bg-emerald-500"
+              >
                 Proceed to Checkout
                 <ArrowRight size={20} />
               </button>

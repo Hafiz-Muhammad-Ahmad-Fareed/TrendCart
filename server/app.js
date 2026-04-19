@@ -10,6 +10,8 @@ import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import catalogRoutes from "./routes/catalog.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
+import orderRoutes from "./routes/order.routes.js";
+import { handleWebhook } from "./controllers/order.controller.js";
 
 const app = express();
 
@@ -26,9 +28,7 @@ app.use(
 app.use(
   "/api/payment/webhook",
   express.raw({ type: "application/json" }),
-  (req, res, next) => {
-    next();
-  },
+  handleWebhook,
 );
 
 app.use(express.urlencoded({ extended: false }));
@@ -42,6 +42,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
 app.use("/api", catalogRoutes);
 app.use(errorHandlerMiddleware(logger));
 

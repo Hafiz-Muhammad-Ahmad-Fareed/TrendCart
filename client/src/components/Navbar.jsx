@@ -1,4 +1,4 @@
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Show, SignInButton, UserButton } from "@clerk/react";
 import useUserStore from "../stores/useUserStore";
@@ -64,6 +64,16 @@ const Navbar = () => {
                     </span>
                   )}
                 </Link>
+
+                <Show when="signed-in">
+                  <Link
+                    to="/orders"
+                    className="text-gray-300 transition hover:text-emerald-400"
+                    title="My Orders"
+                  >
+                    Orders
+                  </Link>
+                </Show>
               </>
             )}
             <Show when="signed-out">
