@@ -7,3 +7,5 @@ export const getPublicCategories = asyncHandler(
 export const getProductsByCategorySlug = asyncHandler(
   catalogService.getProductsByCategorySlug,
 );
+export const getProductBySlug = asyncHandler(catalogService.getProductBySlug);
+export const getSimilarProducts = asyncHandler(catalogService.getSimilarProducts);

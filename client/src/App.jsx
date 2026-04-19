@@ -8,14 +8,18 @@ import AdminCategoriesPage from "./pages/AdminCategoriesPage";
 import AdminProductsPage from "./pages/AdminProductsPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import CategoryPage from "./pages/CategoryPage";
+import ProductDetailsPage from "./pages/ProductDetailsPage";
+import CartPage from "./pages/CartPage";
 import Navbar from "./components/Navbar";
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./components/AdminLayout";
 import useUserStore from "./stores/useUserStore";
+import useCartStore from "./stores/useCartStore";
 
 function App() {
   const { userId, isLoaded } = useAuth();
   const { user, fetchUser, resetUser, hasFetched, isLoading } = useUserStore();
+  const { fetchCart } = useCartStore();
 
   useEffect(() => {
     if (!isLoaded) {
@@ -29,8 +33,9 @@ function App() {
 
     if (!hasFetched && !isLoading) {
       fetchUser();
+      fetchCart();
     }
-  }, [fetchUser, hasFetched, isLoaded, isLoading, resetUser, userId]);
+  }, [fetchCart, fetchUser, hasFetched, isLoaded, isLoading, resetUser, userId]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gray-900 text-white">
@@ -54,6 +59,8 @@ function App() {
             }
           />
           <Route path="/category/:slug" element={<CategoryPage />} />
+          <Route path="/product/:slug" element={<ProductDetailsPage />} />
+          <Route path="/cart" element={<CartPage />} />
           <Route
             path="/admin-dashboard"
             element={

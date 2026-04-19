@@ -9,6 +9,7 @@ import clerkRoutes from "./routes/clerk.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import catalogRoutes from "./routes/catalog.routes.js";
+import cartRoutes from "./routes/cart.routes.js";
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.get("/api/health", (req, res) => {
 });
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/cart", cartRoutes);
 app.use("/api", catalogRoutes);
 app.use(errorHandlerMiddleware(logger));
 

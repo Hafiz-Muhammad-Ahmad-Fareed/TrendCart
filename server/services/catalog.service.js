@@ -44,3 +44,32 @@ export const getProductsByCategorySlug = async (req, res) => {
     products: products.map(shapeProduct),
   });
 };
+
+export const getProductBySlug = async (req, res) => {
+  const product = await productRepository.findBySlug(req.params.slug);
+
+  if (!product || product.status !== "active") {
+    return res.status(404).json({ message: "Product not found" });
+  }
+
+  return res.status(200).json({
+    product: shapeProduct(product),
+  });
+};
+
+export const getSimilarProducts = async (req, res) => {
+  const product = await productRepository.findBySlug(req.params.slug);
+
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+
+  const products = await productRepository.findSimilar(
+    product.category._id,
+    product._id,
+  );
+
+  return res.status(200).json({
+    products: products.map(shapeProduct),
+  });
+};

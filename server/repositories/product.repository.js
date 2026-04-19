@@ -43,6 +43,25 @@ const productRepository = {
       .lean();
   },
 
+  async findBySlug(slug) {
+    return Product.findOne({ slug })
+      .populate({
+        path: "category",
+        select: "name slug isActive",
+      })
+      .lean();
+  },
+
+  async findSimilar(categoryId, currentProductId, limit = 4) {
+    return Product.find({
+      category: categoryId,
+      _id: { $ne: currentProductId },
+      status: "active",
+    })
+      .limit(limit)
+      .lean();
+  },
+
   async existsBySlug(slug, excludeId) {
     const filter = { slug };
 

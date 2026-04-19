@@ -6,8 +6,11 @@ const useCatalogStore = create((set) => ({
   categories: [],
   currentCategory: null,
   categoryProducts: [],
+  currentProduct: null,
+  similarProducts: [],
   isCategoriesLoading: false,
   isCategoryProductsLoading: false,
+  isProductDetailsLoading: false,
 
   fetchCategories: async () => {
     set({ isCategoriesLoading: true });
@@ -43,6 +46,32 @@ const useCatalogStore = create((set) => ({
       );
     } finally {
       set({ isCategoryProductsLoading: false });
+    }
+  },
+
+  fetchProductDetails: async (slug) => {
+    set({
+      isProductDetailsLoading: true,
+      currentProduct: null,
+      similarProducts: [],
+    });
+
+    try {
+      const [productRes, similarRes] = await Promise.all([
+        axiosInstance.get(`/products/${slug}`),
+        axiosInstance.get(`/products/${slug}/similar`),
+      ]);
+
+      set({
+        currentProduct: productRes.data.product,
+        similarProducts: similarRes.data.products || [],
+      });
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to load product details",
+      );
+    } finally {
+      set({ isProductDetailsLoading: false });
     }
   },
 }));

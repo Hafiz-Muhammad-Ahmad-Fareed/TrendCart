@@ -2,9 +2,14 @@ import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Show, SignInButton, UserButton } from "@clerk/react";
 import useUserStore from "../stores/useUserStore";
+import useCartStore from "../stores/useCartStore";
 
 const Navbar = () => {
   const { user } = useUserStore();
+  const { cart } = useCartStore();
+
+  const cartItemsCount =
+    cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
   return (
     <header className="fixed top-0 left-0 z-40 w-full border-b border-emerald-800 bg-gray-900/90 shadow-lg backdrop-blur-md transition-all duration-300">
@@ -50,9 +55,14 @@ const Navbar = () => {
 
                 <Link
                   to="/cart"
-                  className="text-gray-300 transition hover:text-emerald-400"
+                  className="relative text-gray-300 transition hover:text-emerald-400"
                 >
                   <ShoppingCart size={20} />
+                  {cartItemsCount > 0 && (
+                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white">
+                      {cartItemsCount}
+                    </span>
+                  )}
                 </Link>
               </>
             )}

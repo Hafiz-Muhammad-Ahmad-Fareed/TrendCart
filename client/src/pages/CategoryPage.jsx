@@ -44,16 +44,17 @@ const CategoryPage = () => {
             ) : (
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {categoryProducts.map((product) => (
-                  <article
+                  <Link
                     key={product._id}
-                    className="overflow-hidden rounded-4xl border border-gray-800 bg-gray-900/70 shadow-2xl shadow-emerald-950/10"
+                    to={`/product/${product.slug}`}
+                    className="group overflow-hidden rounded-4xl border border-gray-800 bg-gray-900/70 shadow-2xl shadow-emerald-950/10 transition hover:border-emerald-500/50"
                   >
                     <div className="h-72 overflow-hidden bg-linear-to-br from-emerald-700/40 to-gray-950">
                       {product.image ? (
                         <img
                           src={product.image}
                           alt={product.name}
-                          className="h-full w-full object-cover transition duration-500 hover:scale-105"
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center px-8 text-center text-2xl font-semibold text-white">
@@ -65,7 +66,7 @@ const CategoryPage = () => {
                     <div className="space-y-4 p-6">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <h2 className="text-2xl font-semibold text-white">
+                          <h2 className="text-2xl font-semibold text-white group-hover:text-emerald-400 transition-colors">
                             {product.name}
                           </h2>
                           <p className="text-sm text-gray-400">
@@ -90,7 +91,7 @@ const CategoryPage = () => {
                         ) : null}
                       </div>
                     </div>
-                  </article>
+                  </Link>
                 ))}
               </div>
             )}
