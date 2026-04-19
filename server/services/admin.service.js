@@ -2,6 +2,7 @@ import { clerkClient } from "@clerk/express";
 import categoryRepository from "../repositories/category.repository.js";
 import productRepository from "../repositories/product.repository.js";
 import userRepository from "../repositories/user.repository.js";
+import orderRepository from "../repositories/order.repository.js";
 import { resolveImageUpload } from "../utils/cloudinary_upload.js";
 import { generateUniqueSlug } from "../utils/slugify.js";
 
@@ -121,13 +122,129 @@ export const getDashboardStats = async (req, res) => {
     userRepository.countDocuments(),
   ]);
 
+  const orders = await orderRepository.findAll();
+  const totalOrders = orders.length;
+
+  // Analytics Calculations
+  const totalRevenue = orders.reduce((sum, order) => {
+    if (order.paymentStatus === "paid") {
+      return sum + order.totalAmount;
+    }
+    return sum;
+  }, 0);
+
+  // 1. Sales over time (last 7 days)
+  const last7Days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    last7Days.push({
+      date: d.toISOString().split("T")[0],
+      sales: 0,
+    });
+  }
+
+  orders.forEach((order) => {
+    if (order.paymentStatus === "paid") {
+      const orderDate = new Date(order.createdAt).toISOString().split("T")[0];
+      const dayData = last7Days.find((d) => d.date === orderDate);
+      if (dayData) {
+        dayData.sales += order.totalAmount;
+      }
+    }
+  });
+
+  // 2. Order status distribution
+  const statusDistribution = [
+    { name: "Pending", value: 0 },
+    { name: "Processing", value: 0 },
+    { name: "Shipped", value: 0 },
+    { name: "Delivered", value: 0 },
+    { name: "Cancelled", value: 0 },
+  ];
+
+  orders.forEach((order) => {
+    const status = order.status.charAt(0).toUpperCase() + order.status.slice(1);
+    const item = statusDistribution.find((s) => s.name === status);
+    if (item) {
+      item.value += 1;
+    }
+  });
+
+  // 3. Revenue by category
+  // Since order items don't have category info directly, we'd need to populate or look up.
+  // For now, let's group by status or some other available metric if category is hard.
+  // Actually, let's try to get category if possible.
+  const categoryRevenueMap = {};
+  
+  // We need to fetch products to know their categories if we want accurate data.
+  // Or we can assume items in orders might have category if we populated it.
+  // Let's do a simple top products by revenue instead if category is too complex to fetch here efficiently.
+  const productRevenueMap = {};
+  orders.forEach(order => {
+    if (order.paymentStatus === "paid") {
+      order.items.forEach(item => {
+        if (!productRevenueMap[item.name]) {
+          productRevenueMap[item.name] = 0;
+        }
+        productRevenueMap[item.name] += item.price * item.quantity;
+      });
+    }
+  });
+
+  const topProducts = Object.entries(productRevenueMap)
+    .map(([name, revenue]) => ({ name, revenue }))
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 5);
+
   return res.status(200).json({
     counts: {
       categories,
       products,
       activeProducts,
       users,
+      orders: totalOrders,
+      totalRevenue,
     },
+    analytics: {
+      salesOverTime: last7Days,
+      statusDistribution,
+      topProducts,
+    },
+  });
+};
+
+export const getOrders = async (req, res) => {
+  const orders = await orderRepository.findAll();
+  return res.status(200).json({ orders });
+};
+
+export const updateOrderStatus = async (req, res) => {
+  const { status } = req.body;
+  const { id } = req.params;
+
+  const validStatuses = [
+    "pending",
+    "processing",
+    "shipped",
+    "delivered",
+    "cancelled",
+  ];
+
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ message: "Invalid status" });
+  }
+
+  const order = await orderRepository.findById(id);
+  if (!order) {
+    return res.status(404).json({ message: "Order not found" });
+  }
+
+  const updatedOrder = await orderRepository.updateById(id, { status });
+
+  return res.status(200).json({
+    message: "Order status updated",
+    order: updatedOrder,
   });
 };
 

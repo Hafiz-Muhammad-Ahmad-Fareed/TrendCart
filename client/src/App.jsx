@@ -7,6 +7,7 @@ import AdminDashboardPage from "./pages/AdminDashboardPage";
 import AdminCategoriesPage from "./pages/AdminCategoriesPage";
 import AdminProductsPage from "./pages/AdminProductsPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
+import AdminOrdersPage from "./pages/AdminOrdersPage";
 import CategoryPage from "./pages/CategoryPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import CartPage from "./pages/CartPage";
@@ -78,6 +79,7 @@ function App() {
             <Route path="categories" element={<AdminCategoriesPage />} />
             <Route path="products" element={<AdminProductsPage />} />
             <Route path="users" element={<AdminUsersPage />} />
+            <Route path="orders" element={<AdminOrdersPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

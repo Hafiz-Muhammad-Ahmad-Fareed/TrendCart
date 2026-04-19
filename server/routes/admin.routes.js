@@ -15,6 +15,8 @@ import {
   updateProduct,
   updateUserRole,
   deleteUser,
+  getOrders,
+  updateOrderStatus,
 } from "../controllers/admin.controller.js";
 
 const router = Router();
@@ -36,5 +38,8 @@ router.delete("/products/:id", deleteProduct);
 router.get("/users", getUsers);
 router.put("/users/:id/role", updateUserRole);
 router.delete("/users/:id", deleteUser);
+
+router.get("/orders", getOrders);
+router.put("/orders/:id/status", updateOrderStatus);
 
 export default router;

@@ -13,3 +13,5 @@ export const deleteProduct = asyncHandler(adminService.deleteProduct);
 export const getUsers = asyncHandler(adminService.getUsers);
 export const updateUserRole = asyncHandler(adminService.updateUserRole);
 export const deleteUser = asyncHandler(adminService.deleteUser);
+export const getOrders = asyncHandler(adminService.getOrders);
+export const updateOrderStatus = asyncHandler(adminService.updateOrderStatus);

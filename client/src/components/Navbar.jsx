@@ -24,26 +24,7 @@ const Navbar = () => {
 
           <nav className="flex items-center gap-6">
             {user?.role === "admin" ? (
-              <>
-                {/* <Link
-                  to="/admin-dashboard"
-                  className="text-gray-300 transition duration-300 ease-in-out hover:text-emerald-400"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/admin-dashboard/categories"
-                  className="text-gray-300 transition duration-300 ease-in-out hover:text-emerald-400"
-                >
-                  Categories
-                </Link>
-                <Link
-                  to="/admin-dashboard/products"
-                  className="text-gray-300 transition duration-300 ease-in-out hover:text-emerald-400"
-                >
-                  Products
-                </Link> */}
-              </>
+              <></>
             ) : (
               <>
                 <Link

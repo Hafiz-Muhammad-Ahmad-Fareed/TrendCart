@@ -1,4 +1,10 @@
-import { LayoutDashboard, Package, Tag, Users } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  Tag,
+  Users,
+  ShoppingCart,
+} from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 
 const linkClasses = ({ isActive }) =>
@@ -38,6 +44,10 @@ const AdminLayout = () => {
             <NavLink to="/admin-dashboard/products" className={linkClasses}>
               <Package size={16} />
               Products
+            </NavLink>
+            <NavLink to="/admin-dashboard/orders" className={linkClasses}>
+              <ShoppingCart size={16} />
+              Orders
             </NavLink>
             <NavLink to="/admin-dashboard/users" className={linkClasses}>
               <Users size={16} />

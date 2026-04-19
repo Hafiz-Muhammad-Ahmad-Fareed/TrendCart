@@ -5,12 +5,30 @@ import {
   Tag,
   Users,
   ShoppingCart,
+  DollarSign,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
 import useAdminStore from "../stores/useAdminStore";
 
+const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"];
+
 const AdminDashboardPage = () => {
-  const { counts, isDashboardLoading, fetchDashboard } = useAdminStore();
+  const { counts, analytics, isDashboardLoading, fetchDashboard } =
+    useAdminStore();
 
   useEffect(() => {
     fetchDashboard();
@@ -18,22 +36,22 @@ const AdminDashboardPage = () => {
 
   const stats = [
     {
-      label: "Total Categories",
-      value: counts.categories,
-      icon: Tag,
-      color: "from-amber-500 to-orange-600",
+      label: "Total Revenue",
+      value: `$${counts.totalRevenue?.toFixed(2) || "0.00"}`,
+      icon: DollarSign,
+      color: "from-green-500 to-emerald-600",
+    },
+    {
+      label: "Total Orders",
+      value: counts.orders || "0",
+      icon: ShoppingCart,
+      color: "from-blue-500 to-indigo-600",
     },
     {
       label: "Total Products",
       value: counts.products,
       icon: Package,
       color: "from-emerald-500 to-teal-600",
-    },
-    {
-      label: "Total Orders",
-      value: "0",
-      icon: ShoppingCart,
-      color: "from-blue-500 to-indigo-600",
     },
     {
       label: "Total Users",
@@ -53,11 +71,12 @@ const AdminDashboardPage = () => {
               Admin Dashboard
             </h2>
             <p className="mt-2 text-sm text-gray-400">
-              Track how much of the catalog is live and where to manage it next.
+              Real-time store analytics and overview.
             </p>
           </div>
         </div>
 
+        {/* Stats Grid */}
         <div className="grid grid-cols-1 gap-6 mb-12 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <div
@@ -68,7 +87,7 @@ const AdminDashboardPage = () => {
                 <h3 className="text-sm font-medium text-gray-400">
                   {stat.label}
                 </h3>
-                <div className={`rounded-lg bg-linear-to-r p-2 ${stat.color}`}>
+                <div className={`rounded-lg bg-gradient-to-r p-2 ${stat.color}`}>
                   <stat.icon size={20} className="text-white" />
                 </div>
               </div>
@@ -79,41 +98,128 @@ const AdminDashboardPage = () => {
           ))}
         </div>
 
-        {/* <div className="rounded-xl border border-gray-700 bg-gray-800/50 p-6 backdrop-blur-md">
-          <h2 className="mb-4 text-xl font-semibold text-white">
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Link
-              to="/admin-dashboard/categories"
-              className="flex items-center justify-center gap-3 rounded-lg bg-amber-600 px-5 py-3 text-white transition duration-300 hover:bg-amber-700"
-            >
-              <Tag size={18} />
-              Manage Categories
-            </Link>
-            <Link
-              to="/admin-dashboard/products"
-              className="flex items-center justify-center gap-3 rounded-lg bg-emerald-600 px-5 py-3 text-white transition duration-300 hover:bg-emerald-700"
-            >
-              <Package size={18} />
-              Manage Products
-            </Link>
-            <Link
-              to="/admin-dashboard/orders"
-              className="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg transition duration-300 cursor-pointer"
-            >
-              <ShoppingCart size={18} />
-              Manage Orders
-            </Link>
-            <Link
-              to="/admin-dashboard/users"
-              className="flex items-center justify-center gap-3 rounded-lg bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 transition duration-300"
-            >
-              <Users size={18} />
-              Manage users
-            </Link>
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          {/* Sales Over Time - Line Chart */}
+          <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700 backdrop-blur-md">
+            <h3 className="text-lg font-semibold mb-6 text-emerald-400">
+              Sales Over Time (Last 7 Days)
+            </h3>
+            <div className="h-80 w-full">
+              {analytics?.salesOverTime ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={analytics.salesOverTime}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis
+                      dataKey="date"
+                      stroke="#9ca3af"
+                      tick={{ fontSize: 12 }}
+                    />
+                    <YAxis stroke="#9ca3af" tick={{ fontSize: 12 }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#1f2937",
+                        borderColor: "#374151",
+                        color: "#fff",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="sales"
+                      stroke="#10b981"
+                      strokeWidth={3}
+                      dot={{ r: 4, fill: "#10b981" }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-gray-500">
+                  Loading analytics...
+                </div>
+              )}
+            </div>
           </div>
-        </div> */}
+
+          {/* Top Products - Bar Chart */}
+          <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700 backdrop-blur-md">
+            <h3 className="text-lg font-semibold mb-6 text-emerald-400">
+              Top 5 Products by Revenue
+            </h3>
+            <div className="h-80 w-full">
+              {analytics?.topProducts ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics.topProducts} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis type="number" stroke="#9ca3af" hide />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      stroke="#9ca3af"
+                      width={100}
+                      tick={{ fontSize: 10 }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#1f2937",
+                        borderColor: "#374151",
+                        color: "#fff",
+                      }}
+                    />
+                    <Bar dataKey="revenue" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-gray-500">
+                  Loading analytics...
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Order Status Distribution - Pie Chart */}
+          <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700 backdrop-blur-md">
+            <h3 className="text-lg font-semibold mb-6 text-emerald-400">
+              Order Status Distribution
+            </h3>
+            <div className="h-80 w-full">
+              {analytics?.statusDistribution ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={analytics.statusDistribution}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {analytics.statusDistribution.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#1f2937",
+                        borderColor: "#374151",
+                        color: "#fff",
+                      }}
+                    />
+                    <Legend verticalAlign="bottom" height={36} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-gray-500">
+                  Loading analytics...
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

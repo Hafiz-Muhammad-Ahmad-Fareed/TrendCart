@@ -54,17 +54,23 @@ const useAdminStore = create((set, get) => ({
     products: 0,
     activeProducts: 0,
     users: 0,
+    orders: 0,
+    totalRevenue: 0,
   },
+  analytics: null,
   categories: [],
   products: [],
   users: [],
+  orders: [],
   isDashboardLoading: false,
   isCategoriesLoading: false,
   isProductsLoading: false,
   isUsersLoading: false,
+  isOrdersLoading: false,
   isSavingCategory: false,
   isSavingProduct: false,
   isUpdatingUser: false,
+  isUpdatingOrder: false,
   isDeleting: false,
 
   fetchDashboard: async () => {
@@ -73,7 +79,7 @@ const useAdminStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get("/admin/dashboard");
 
-      set({ counts: res.data.counts });
+      set({ counts: res.data.counts, analytics: res.data.analytics });
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to load dashboard");
     } finally {
@@ -236,6 +242,33 @@ const useAdminStore = create((set, get) => ({
       toast.error(error.response?.data?.message || "Failed to delete user");
     } finally {
       set({ isDeleting: false });
+    }
+  },
+  fetchOrders: async () => {
+    set({ isOrdersLoading: true });
+    try {
+      const res = await axiosInstance.get("/admin/orders");
+      set({ orders: res.data.orders || [] });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to load orders");
+    } finally {
+      set({ isOrdersLoading: false });
+    }
+  },
+  updateOrderStatus: async (orderId, status) => {
+    set({ isUpdatingOrder: true });
+    try {
+      const res = await axiosInstance.put(`/admin/orders/${orderId}/status`, {
+        status,
+      });
+      toast.success(res.data.message);
+      await get().fetchOrders();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to update order status",
+      );
+    } finally {
+      set({ isUpdatingOrder: false });
     }
   },
 }));
