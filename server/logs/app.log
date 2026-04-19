@@ -1431,3 +1431,7 @@
 2026-04-19 14:25:50 [info]: GET /api/admin/dashboard 304 - 11ms - IP: ::1
 2026-04-19 14:25:51 [info]: GET /api/admin/dashboard 304 - 10ms - IP: ::1
 2026-04-19 14:25:51 [info]: GET /api/admin/dashboard 304 - 11ms - IP: ::1
+2026-04-19 14:27:48 [info]: OPTIONS /api/admin/dashboard 204 - 2ms - IP: ::1
+2026-04-19 14:27:49 [info]: GET /api/admin/dashboard 200 - 727ms - IP: ::1
+2026-04-19 14:28:25 [info]: OPTIONS /api/admin/dashboard 204 - 1ms - IP: ::1
+2026-04-19 14:28:25 [info]: GET /api/admin/dashboard 304 - 9ms - IP: ::1
