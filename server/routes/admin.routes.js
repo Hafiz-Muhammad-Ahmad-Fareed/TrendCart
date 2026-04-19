@@ -10,8 +10,11 @@ import {
   getCategories,
   getDashboardStats,
   getProducts,
+  getUsers,
   updateCategory,
   updateProduct,
+  updateUserRole,
+  deleteUser,
 } from "../controllers/admin.controller.js";
 
 const router = Router();
@@ -29,5 +32,9 @@ router.get("/products", getProducts);
 router.post("/products", parseMultipartForm, createProduct);
 router.put("/products/:id", parseMultipartForm, updateProduct);
 router.delete("/products/:id", deleteProduct);
+
+router.get("/users", getUsers);
+router.put("/users/:id/role", updateUserRole);
+router.delete("/users/:id", deleteUser);
 
 export default router;

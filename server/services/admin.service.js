@@ -1,3 +1,4 @@
+import { clerkClient } from "@clerk/express";
 import categoryRepository from "../repositories/category.repository.js";
 import productRepository from "../repositories/product.repository.js";
 import userRepository from "../repositories/user.repository.js";
@@ -65,6 +66,19 @@ const shapeProduct = (product) => ({
     : null,
   createdAt: product.createdAt,
   updatedAt: product.updatedAt,
+});
+
+const shapeUser = (user) => ({
+  _id: user._id,
+  clerkId: user.clerkId,
+  email: user.email,
+  firstName: user.firstName,
+  lastName: user.lastName,
+  fullName: user.fullName,
+  profileImage: user.profileImage,
+  role: user.role,
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt,
 });
 
 const validateCategory = (body) => {
@@ -230,7 +244,9 @@ export const createProduct = async (req, res) => {
   const category = await categoryRepository.findById(req.body.categoryId);
 
   if (!category) {
-    return res.status(400).json({ message: "Selected category does not exist" });
+    return res
+      .status(400)
+      .json({ message: "Selected category does not exist" });
   }
 
   const slug = await generateUniqueSlug(
@@ -277,7 +293,9 @@ export const updateProduct = async (req, res) => {
   const category = await categoryRepository.findById(req.body.categoryId);
 
   if (!category) {
-    return res.status(400).json({ message: "Selected category does not exist" });
+    return res
+      .status(400)
+      .json({ message: "Selected category does not exist" });
   }
 
   const slug = await generateUniqueSlug(
@@ -297,10 +315,7 @@ export const updateProduct = async (req, res) => {
     price: parseNumber(req.body.price),
     category: req.body.categoryId,
     stockQuantity: parseNumber(req.body.stockQuantity),
-    isFeatured: parseBoolean(
-      req.body.isFeatured,
-      existingProduct.isFeatured,
-    ),
+    isFeatured: parseBoolean(req.body.isFeatured, existingProduct.isFeatured),
     status: req.body.status === "inactive" ? "inactive" : "active",
     ...(image ? { image } : {}),
   });
@@ -320,5 +335,75 @@ export const deleteProduct = async (req, res) => {
 
   return res.status(200).json({
     message: "Product deleted successfully",
+  });
+};
+
+export const getUsers = async (req, res) => {
+  const users = await userRepository.findAll();
+
+  return res.status(200).json({
+    users: users.map(shapeUser),
+  });
+};
+
+export const updateUserRole = async (req, res) => {
+  const { role } = req.body;
+
+  if (!["admin", "user"].includes(role)) {
+    return res.status(400).json({ message: "Invalid role" });
+  }
+
+  const user = await userRepository.findById(req.params.id);
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  const updatedUser = await userRepository.updateById(req.params.id, { role });
+
+  return res.status(200).json({
+    message: "User role updated successfully",
+    user: shapeUser(updatedUser),
+  });
+};
+
+export const deleteUser = async (req, res) => {
+  const user = await userRepository.findById(req.params.id);
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  if (user.role === "admin") {
+    const adminCount = await userRepository.countDocuments({ role: "admin" });
+    if (adminCount <= 1) {
+      return res
+        .status(400)
+        .json({ message: "Cannot delete the only admin account" });
+    }
+  }
+
+  // Delete from Clerk first to ensure consistency
+  if (user.clerkId) {
+    try {
+      await clerkClient.users.deleteUser(user.clerkId);
+    } catch (error) {
+      // If user not found in Clerk, we might still want to delete from local DB
+      // but if it's another error (auth, network), we might want to fail.
+      // For now, log it and proceed if it's a 404 (already deleted in Clerk)
+      if (error.status !== 404) {
+        console.error("❌ Error deleting user from Clerk:", error.message);
+        return res.status(500).json({
+          message: "Failed to delete user from authentication service",
+          details: error.message,
+        });
+      }
+    }
+  }
+
+  await userRepository.deleteById(req.params.id);
+
+  return res.status(200).json({
+    message: "User deleted successfully",
   });
 };

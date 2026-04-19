@@ -6,6 +6,7 @@ import HomePage from "./pages/HomePage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import AdminCategoriesPage from "./pages/AdminCategoriesPage";
 import AdminProductsPage from "./pages/AdminProductsPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
 import CategoryPage from "./pages/CategoryPage";
 import Navbar from "./components/Navbar";
 import AdminRoute from "./components/AdminRoute";
@@ -64,6 +65,7 @@ function App() {
             <Route index element={<AdminDashboardPage />} />
             <Route path="categories" element={<AdminCategoriesPage />} />
             <Route path="products" element={<AdminProductsPage />} />
+            <Route path="users" element={<AdminUsersPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

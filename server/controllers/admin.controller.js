@@ -10,3 +10,6 @@ export const getProducts = asyncHandler(adminService.getProducts);
 export const createProduct = asyncHandler(adminService.createProduct);
 export const updateProduct = asyncHandler(adminService.updateProduct);
 export const deleteProduct = asyncHandler(adminService.deleteProduct);
+export const getUsers = asyncHandler(adminService.getUsers);
+export const updateUserRole = asyncHandler(adminService.updateUserRole);
+export const deleteUser = asyncHandler(adminService.deleteUser);

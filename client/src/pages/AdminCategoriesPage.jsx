@@ -189,9 +189,9 @@ const AdminCategoriesPage = () => {
               Every category here drives the public homepage.
             </p>
           </div>
-          <div className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
+          {/* <div className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
             {categories.length} total
-          </div>
+          </div> */}
         </div>
 
         {isCategoriesLoading ? (
@@ -201,67 +201,82 @@ const AdminCategoriesPage = () => {
             No categories yet. Create the first one from the form.
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {categories.map((category) => (
-              <article
-                key={category._id}
-                className="overflow-hidden rounded-3xl border border-gray-800 bg-gray-950/60"
-              >
-                <div className="h-44 w-full bg-gradient-to-br from-emerald-700/40 to-gray-950">
-                  {category.image ? (
-                    <img
-                      src={category.image}
-                      alt={category.name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : null}
-                </div>
-
-                <div className="space-y-4 p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="text-lg font-semibold text-white">
-                        {category.name}
-                      </h3>
-                      <p className="text-sm text-gray-400">{category.slug}</p>
-                    </div>
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        category.isActive
-                          ? "bg-emerald-500/15 text-emerald-300"
-                          : "bg-gray-700 text-gray-300"
-                      }`}
-                    >
-                      {category.isActive ? "Active" : "Hidden"}
-                    </span>
-                  </div>
-
-                  <p className="min-h-12 text-sm text-gray-300">
-                    {category.description || "No description yet."}
-                  </p>
-
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={() => handleEdit(category)}
-                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-100 transition hover:border-emerald-500 hover:text-emerald-300"
-                    >
-                      <Pencil size={16} />
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(category._id)}
-                      disabled={isDeleting}
-                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-red-500/40 px-4 py-2 text-sm font-semibold text-red-300 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <Trash2 size={16} />
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
+          <div className="overflow-hidden rounded-2xl border border-gray-800 bg-gray-950/40">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-gray-900/50 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                <tr>
+                  <th className="px-6 py-4">Category</th>
+                  <th className="px-6 py-4">Slug</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-800/50">
+                {categories.map((category) => (
+                  <tr
+                    key={category._id}
+                    className="group transition hover:bg-emerald-500/5"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        {category.image ? (
+                          <img
+                            src={category.image}
+                            alt={category.name}
+                            className="h-12 w-12 rounded-xl object-cover ring-1 ring-gray-700"
+                          />
+                        ) : (
+                          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-800 text-gray-500">
+                            <Tag size={20} />
+                          </div>
+                        )}
+                        <div>
+                          <div className="font-medium text-white">
+                            {category.name}
+                          </div>
+                          <div className="text-xs text-gray-500 line-clamp-1 max-w-[200px]">
+                            {category.description || "No description"}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-400 font-mono">
+                      /{category.slug}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                          category.isActive
+                            ? "bg-emerald-500/15 text-emerald-400"
+                            : "bg-gray-700/50 text-gray-400"
+                        }`}
+                      >
+                        {category.isActive ? "Active" : "Hidden"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => handleEdit(category)}
+                          className="p-2 text-gray-400 transition hover:text-emerald-400 hover:bg-emerald-400/10 rounded-lg"
+                          title="Edit Category"
+                        >
+                          <Pencil size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(category._id)}
+                          disabled={isDeleting}
+                          className="p-2 text-gray-400 transition hover:text-red-400 hover:bg-red-400/10 rounded-lg disabled:opacity-30"
+                          title="Delete Category"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </section>

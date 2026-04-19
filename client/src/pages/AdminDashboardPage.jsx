@@ -68,9 +68,7 @@ const AdminDashboardPage = () => {
                 <h3 className="text-sm font-medium text-gray-400">
                   {stat.label}
                 </h3>
-                <div
-                  className={`rounded-lg bg-gradient-to-r p-2 ${stat.color}`}
-                >
+                <div className={`rounded-lg bg-linear-to-r p-2 ${stat.color}`}>
                   <stat.icon size={20} className="text-white" />
                 </div>
               </div>
@@ -81,7 +79,7 @@ const AdminDashboardPage = () => {
           ))}
         </div>
 
-        <div className="rounded-xl border border-gray-700 bg-gray-800/50 p-6 backdrop-blur-md">
+        {/* <div className="rounded-xl border border-gray-700 bg-gray-800/50 p-6 backdrop-blur-md">
           <h2 className="mb-4 text-xl font-semibold text-white">
             Quick Actions
           </h2>
@@ -100,10 +98,6 @@ const AdminDashboardPage = () => {
               <Package size={18} />
               Manage Products
             </Link>
-            {/* <div className="flex items-center justify-center gap-3 rounded-lg border border-blue-500/30 bg-blue-600/20 px-5 py-3 text-blue-200">
-              <Package size={18} />
-              {isDashboardLoading ? "Refreshing..." : "Catalog synced"}
-            </div> */}
             <Link
               to="/admin-dashboard/orders"
               className="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg transition duration-300 cursor-pointer"
@@ -119,7 +113,7 @@ const AdminDashboardPage = () => {
               Manage users
             </Link>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

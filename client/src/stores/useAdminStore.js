@@ -57,11 +57,14 @@ const useAdminStore = create((set, get) => ({
   },
   categories: [],
   products: [],
+  users: [],
   isDashboardLoading: false,
   isCategoriesLoading: false,
   isProductsLoading: false,
+  isUsersLoading: false,
   isSavingCategory: false,
   isSavingProduct: false,
+  isUpdatingUser: false,
   isDeleting: false,
 
   fetchDashboard: async () => {
@@ -113,6 +116,20 @@ const useAdminStore = create((set, get) => ({
       toast.error(error.response?.data?.message || "Failed to load products");
     } finally {
       set({ isProductsLoading: false });
+    }
+  },
+
+  fetchUsers: async () => {
+    set({ isUsersLoading: true });
+
+    try {
+      const res = await axiosInstance.get("/admin/users");
+
+      set({ users: res.data.users || [] });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to load users");
+    } finally {
+      set({ isUsersLoading: false });
     }
   },
 
@@ -185,6 +202,38 @@ const useAdminStore = create((set, get) => ({
       await Promise.all([get().fetchProducts(filters), get().fetchDashboard()]);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete product");
+    } finally {
+      set({ isDeleting: false });
+    }
+  },
+
+  updateUserRole: async (userId, role) => {
+    set({ isUpdatingUser: true });
+
+    try {
+      const res = await axiosInstance.put(`/admin/users/${userId}/role`, {
+        role,
+      });
+
+      toast.success(res.data.message);
+      await get().fetchUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update user role");
+    } finally {
+      set({ isUpdatingUser: false });
+    }
+  },
+
+  deleteUser: async (userId) => {
+    set({ isDeleting: true });
+
+    try {
+      const res = await axiosInstance.delete(`/admin/users/${userId}`);
+
+      toast.success(res.data.message);
+      await Promise.all([get().fetchUsers(), get().fetchDashboard()]);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete user");
     } finally {
       set({ isDeleting: false });
     }

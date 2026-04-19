@@ -37,35 +37,6 @@ const CategoryPage = () => {
           </div>
         ) : (
           <>
-            <div className="mb-12 grid gap-8 overflow-hidden rounded-[2rem] border border-gray-800 bg-gray-900/70 p-8 lg:grid-cols-[1.4fr_1fr]">
-              <div>
-                <p className="mb-3 text-sm uppercase tracking-[0.3em] text-emerald-300/70">
-                  Live category
-                </p>
-                <h1 className="text-4xl font-bold text-white sm:text-5xl">
-                  {currentCategory.name}
-                </h1>
-                <p className="mt-4 max-w-2xl text-lg text-gray-300">
-                  {currentCategory.description ||
-                    "Browse the latest products in this category."}
-                </p>
-              </div>
-
-              <div className="overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-emerald-700/40 to-gray-950">
-                {currentCategory.image ? (
-                  <img
-                    src={currentCategory.image}
-                    alt={currentCategory.name}
-                    className="h-full max-h-72 w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full min-h-72 items-center justify-center px-8 text-center text-2xl font-semibold text-white">
-                    {currentCategory.name}
-                  </div>
-                )}
-              </div>
-            </div>
-
             {categoryProducts.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-gray-700 bg-gray-900/40 p-12 text-center text-gray-400">
                 No active products are published in this category yet.
@@ -75,9 +46,9 @@ const CategoryPage = () => {
                 {categoryProducts.map((product) => (
                   <article
                     key={product._id}
-                    className="overflow-hidden rounded-[2rem] border border-gray-800 bg-gray-900/70 shadow-2xl shadow-emerald-950/10"
+                    className="overflow-hidden rounded-4xl border border-gray-800 bg-gray-900/70 shadow-2xl shadow-emerald-950/10"
                   >
-                    <div className="h-72 overflow-hidden bg-gradient-to-br from-emerald-700/40 to-gray-950">
+                    <div className="h-72 overflow-hidden bg-linear-to-br from-emerald-700/40 to-gray-950">
                       {product.image ? (
                         <img
                           src={product.image}
@@ -97,7 +68,9 @@ const CategoryPage = () => {
                           <h2 className="text-2xl font-semibold text-white">
                             {product.name}
                           </h2>
-                          <p className="text-sm text-gray-400">{product.slug}</p>
+                          <p className="text-sm text-gray-400">
+                            {product.slug}
+                          </p>
                         </div>
                         <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-sm font-semibold text-emerald-300">
                           ${Number(product.price).toFixed(2)}
