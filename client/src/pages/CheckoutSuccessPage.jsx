@@ -4,11 +4,11 @@ import { CheckCircle, ShoppingBag, ArrowRight } from "lucide-react";
 import useCartStore from "../stores/useCartStore";
 
 const CheckoutSuccessPage = () => {
-  const { fetchCart } = useCartStore();
+  const { clearCart } = useCartStore();
 
   useEffect(() => {
-    fetchCart();
-  }, [fetchCart]);
+    clearCart();
+  }, [clearCart]);
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center text-white">

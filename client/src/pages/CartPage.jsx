@@ -6,7 +6,7 @@ const CartPage = () => {
   const { cart, updateQuantity, removeFromCart, isCartLoading, checkout } =
     useCartStore();
 
-  const cartItems = cart?.items || [];
+  const cartItems = cart || [];
   const subtotal = cartItems.reduce(
     (acc, item) => acc + item.product.price * item.quantity,
     0,

@@ -1,75 +1,80 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
 
-const useCartStore = create((set, get) => ({
-  cart: null,
-  isCartLoading: false,
+const useCartStore = create(
+  persist(
+    (set, get) => ({
+      cart: [],
+      isCartLoading: false,
 
-  fetchCart: async () => {
-    set({ isCartLoading: true });
-    try {
-      const res = await axiosInstance.get("/cart");
-      set({ cart: res.data.cart });
-    } catch (error) {
-      // Don't toast error here as it might be common for guest users if not handled properly
-      set({ cart: null });
-    } finally {
-      set({ isCartLoading: false });
-    }
-  },
+      addToCart: (product) => {
+        set((state) => {
+          const existingItem = state.cart.find(
+            (item) => item.product._id === product._id,
+          );
+          let newCart;
+          if (existingItem) {
+            newCart = state.cart.map((item) =>
+              item.product._id === product._id
+                ? { ...item, quantity: item.quantity + 1 }
+                : item,
+            );
+          } else {
+            newCart = [...state.cart, { product, quantity: 1 }];
+          }
+          toast.success("Added to cart");
+          return { cart: newCart };
+        });
+      },
 
-  addToCart: async (productId) => {
-    try {
-      const res = await axiosInstance.post("/cart/add", { productId });
-      set({ cart: res.data.cart });
-      toast.success("Added to cart");
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to add to cart");
-    }
-  },
+      updateQuantity: (productId, quantity) => {
+        set((state) => ({
+          cart: state.cart.map((item) =>
+            item.product._id === productId ? { ...item, quantity } : item,
+          ),
+        }));
+      },
 
-  updateQuantity: async (productId, quantity) => {
-    try {
-      const res = await axiosInstance.put("/cart/update-quantity", {
-        productId,
-        quantity,
-      });
-      set({ cart: res.data.cart });
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update quantity");
-    }
-  },
+      removeFromCart: (productId) => {
+        set((state) => ({
+          cart: state.cart.filter((item) => item.product._id !== productId),
+        }));
+        toast.success("Removed from cart");
+      },
 
-  removeFromCart: async (productId) => {
-    try {
-      const res = await axiosInstance.delete(`/cart/remove/${productId}`);
-      set({ cart: res.data.cart });
-      toast.success("Removed from cart");
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to remove from cart");
-    }
-  },
+      clearCart: () => {
+        set({ cart: [] });
+      },
 
-  clearCart: async () => {
-    try {
-      const res = await axiosInstance.delete("/cart/clear");
-      set({ cart: res.data.cart });
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to clear cart");
-    }
-  },
+      checkout: async () => {
+        const { cart } = get();
+        if (cart.length === 0) {
+          toast.error("Cart is empty");
+          return;
+        }
 
-  checkout: async () => {
-    try {
-      const res = await axiosInstance.post("/orders/checkout-session");
-      if (res.data.url) {
-        window.location.href = res.data.url;
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Checkout failed");
-    }
-  },
-}));
+        try {
+          const res = await axiosInstance.post("/orders/checkout-session", {
+            cartItems: cart.map((item) => ({
+              productId: item.product._id,
+              quantity: item.quantity,
+            })),
+          });
+          if (res.data.url) {
+            window.location.href = res.data.url;
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Checkout failed");
+        }
+      },
+    }),
+    {
+      name: "trendcart-cart",
+      storage: createJSONStorage(() => localStorage),
+    },
+  ),
+);
 
 export default useCartStore;

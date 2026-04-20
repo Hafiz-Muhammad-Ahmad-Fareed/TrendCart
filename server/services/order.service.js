@@ -1,6 +1,5 @@
 import Stripe from "stripe";
 import orderRepository from "../repositories/order.repository.js";
-import cartRepository from "../repositories/cart.repository.js";
 import userRepository from "../repositories/user.repository.js";
 import productRepository from "../repositories/product.repository.js";
 
@@ -12,13 +11,27 @@ export const createCheckoutSession = async (req, res) => {
     return res.status(404).json({ message: "User not found" });
   }
 
-  const cart = await cartRepository.findByUserId(user._id);
-  if (!cart || cart.items.length === 0) {
+  const { cartItems } = req.body;
+  if (!cartItems || cartItems.length === 0) {
     return res.status(400).json({ message: "Cart is empty" });
   }
 
+  // Fetch product details for the items in the cart
+  const enrichedItems = await Promise.all(
+    cartItems.map(async (item) => {
+      const product = await productRepository.findById(item.productId);
+      if (!product) {
+        throw new Error(`Product with ID ${item.productId} not found`);
+      }
+      return {
+        product,
+        quantity: item.quantity,
+      };
+    }),
+  );
+
   let totalAmount = 0;
-  const lineItems = cart.items.map((item) => {
+  const lineItems = enrichedItems.map((item) => {
     const amount = Math.round(item.product.price * 100); // Stripe expects amounts in cents
     totalAmount += amount * item.quantity;
     return {
@@ -52,7 +65,7 @@ export const createCheckoutSession = async (req, res) => {
   // Create pending order
   await orderRepository.create({
     user: user._id,
-    items: cart.items.map((item) => ({
+    items: enrichedItems.map((item) => ({
       product: item.product._id,
       name: item.product.name,
       price: item.product.price,
@@ -111,9 +124,7 @@ export const handleWebhook = async (req, res) => {
           }
         }
 
-        // Clear user's cart
-        await cartRepository.updateByUserId(order.user, { items: [] });
-        console.log(`Order ${order._id} updated successfully and cart cleared.`);
+        console.log(`Order ${order._id} updated successfully.`);
       } else {
         console.log(`Order NOT found for session ID: ${session.id}`);
       }

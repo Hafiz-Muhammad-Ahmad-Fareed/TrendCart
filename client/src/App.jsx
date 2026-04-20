@@ -17,12 +17,10 @@ import Navbar from "./components/Navbar";
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./components/AdminLayout";
 import useUserStore from "./stores/useUserStore";
-import useCartStore from "./stores/useCartStore";
 
 function App() {
   const { userId, isLoaded } = useAuth();
   const { user, fetchUser, resetUser, hasFetched, isLoading } = useUserStore();
-  const { fetchCart } = useCartStore();
 
   useEffect(() => {
     if (!isLoaded) {
@@ -36,17 +34,8 @@ function App() {
 
     if (!hasFetched && !isLoading) {
       fetchUser();
-      fetchCart();
     }
-  }, [
-    fetchCart,
-    fetchUser,
-    hasFetched,
-    isLoaded,
-    isLoading,
-    resetUser,
-    userId,
-  ]);
+  }, [fetchUser, hasFetched, isLoaded, isLoading, resetUser, userId]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gray-900 text-white">
