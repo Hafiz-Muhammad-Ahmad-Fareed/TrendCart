@@ -1,15 +1,12 @@
 import { useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { CheckCircle, ShoppingBag, ArrowRight } from "lucide-react";
 import useCartStore from "../stores/useCartStore";
 
 const CheckoutSuccessPage = () => {
-  const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get("session_id");
   const { fetchCart } = useCartStore();
 
   useEffect(() => {
-    // Refresh cart in case webhook hasn't cleared it yet or to show empty cart
     fetchCart();
   }, [fetchCart]);
 
@@ -20,17 +17,13 @@ const CheckoutSuccessPage = () => {
           <CheckCircle size={56} />
         </div>
 
-        <h1 className="mb-4 text-4xl font-bold text-white">Payment Successful!</h1>
+        <h1 className="mb-4 text-4xl font-bold text-white">
+          Payment Successful!
+        </h1>
         <p className="mb-8 text-lg text-gray-400">
           Thank you for your purchase. Your order has been placed and is being
           processed.
         </p>
-
-        {sessionId && (
-          <div className="mb-8 rounded-2xl bg-gray-800/50 p-4 text-sm text-gray-400">
-            <p>Session ID: <span className="text-emerald-300 font-mono">{sessionId}</span></p>
-          </div>
-        )}
 
         <div className="flex flex-col gap-4">
           <Link
