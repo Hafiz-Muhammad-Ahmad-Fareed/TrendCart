@@ -30,7 +30,12 @@ const CategoryPage = () => {
         </Link>
 
         {isCategoryProductsLoading ? (
-          <p className="text-gray-300">Loading category...</p>
+          <div className="px-6 py-20 text-center text-gray-400">
+            <div className="flex flex-col items-center gap-3">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+              Loading products...
+            </div>
+          </div>
         ) : !currentCategory ? (
           <div className="rounded-3xl border border-dashed border-gray-700 bg-gray-900/40 p-12 text-center text-gray-400">
             Category not found.

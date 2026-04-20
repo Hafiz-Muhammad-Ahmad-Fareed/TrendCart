@@ -3,7 +3,8 @@ import CategoryItem from "../components/CategoryItem";
 import useCatalogStore from "../stores/useCatalogStore";
 
 const HomePage = () => {
-  const { categories, isCategoriesLoading, fetchCategories } = useCatalogStore();
+  const { categories, isCategoriesLoading, fetchCategories } =
+    useCatalogStore();
 
   useEffect(() => {
     fetchCategories();
@@ -20,7 +21,12 @@ const HomePage = () => {
         </p>
 
         {isCategoriesLoading ? (
-          <p className="text-center text-gray-300">Loading categories...</p>
+          <div className="px-6 py-20 text-center text-gray-400">
+            <div className="flex flex-col items-center gap-3">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+              Loading categories...
+            </div>
+          </div>
         ) : categories.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-gray-700 bg-gray-900/40 p-12 text-center text-gray-400">
             No categories are live yet.

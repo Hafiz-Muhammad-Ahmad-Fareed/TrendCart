@@ -15,7 +15,6 @@ import OrdersPage from "./pages/OrdersPage";
 import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
 import Navbar from "./components/Navbar";
 import AdminRoute from "./components/AdminRoute";
-import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./components/AdminLayout";
 import useUserStore from "./stores/useUserStore";
 import useCartStore from "./stores/useCartStore";
@@ -39,7 +38,15 @@ function App() {
       fetchUser();
       fetchCart();
     }
-  }, [fetchCart, fetchUser, hasFetched, isLoaded, isLoading, resetUser, userId]);
+  }, [
+    fetchCart,
+    fetchUser,
+    hasFetched,
+    isLoaded,
+    isLoading,
+    resetUser,
+    userId,
+  ]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gray-900 text-white">
@@ -64,9 +71,9 @@ function App() {
           />
           <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/product/:slug" element={<ProductDetailsPage />} />
-          <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
-          <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
-          <Route path="/checkout-success" element={<ProtectedRoute><CheckoutSuccessPage /></ProtectedRoute>} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/checkout-success" element={<CheckoutSuccessPage />} />
           <Route
             path="/admin-dashboard"
             element={

@@ -15,7 +15,12 @@ const CartPage = () => {
   if (isCartLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center text-white">
-        <p className="text-xl">Loading your cart...</p>
+        <div className="px-6 py-20 text-center text-gray-400">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+            Loading your cart...
+          </div>
+        </div>
       </div>
     );
   }
@@ -129,7 +134,7 @@ const CartPage = () => {
             {/* Order Summary */}
             <div className="h-fit space-y-6 rounded-3xl border border-gray-800 bg-gray-900/70 p-8 shadow-2xl">
               <h2 className="text-2xl font-bold">Order Summary</h2>
-              
+
               <div className="space-y-4 border-b border-gray-800 pb-6">
                 <div className="flex justify-between text-gray-400">
                   <span>Subtotal</span>

@@ -34,7 +34,12 @@ const ProductDetailsPage = () => {
   if (isProductDetailsLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center text-white">
-        <p className="text-xl">Loading product details...</p>
+        <div className="px-6 py-20 text-center text-gray-400">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+            Loading product details...
+          </div>
+        </div>
       </div>
     );
   }
@@ -105,9 +110,13 @@ const ProductDetailsPage = () => {
 
             <div className="flex items-center gap-6">
               <div className="text-sm text-gray-400">
-                <span className="block font-medium text-gray-300">Availability</span>
+                <span className="block font-medium text-gray-300">
+                  Availability
+                </span>
                 {currentProduct.stockQuantity > 0 ? (
-                  <span className="text-emerald-400">In Stock ({currentProduct.stockQuantity})</span>
+                  <span className="text-emerald-400">
+                    In Stock ({currentProduct.stockQuantity})
+                  </span>
                 ) : (
                   <span className="text-red-400">Out of Stock</span>
                 )}
