@@ -16,7 +16,7 @@ const cartRepository = {
 
   async updateByUserId(userId, data) {
     return Cart.findOneAndUpdate({ user: userId }, data, {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     })
       .populate({
