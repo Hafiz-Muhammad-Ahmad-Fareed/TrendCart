@@ -189,30 +189,42 @@ const AdminCategoriesPage = () => {
               Every category here drives the public homepage.
             </p>
           </div>
-          {/* <div className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
-            {categories.length} total
-          </div> */}
         </div>
 
-        {isCategoriesLoading ? (
-          <p className="text-gray-400">Loading categories...</p>
-        ) : categories.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-gray-700 bg-gray-950/40 p-10 text-center text-gray-400">
-            No categories yet. Create the first one from the form.
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-2xl border border-gray-800 bg-gray-950/40">
-            <table className="w-full text-left border-collapse">
-              <thead className="bg-gray-900/50 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <div className="overflow-hidden rounded-2xl border border-gray-800 bg-gray-950/40">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-gray-900/50 text-xs font-semibold uppercase tracking-wider text-gray-400">
+              <tr>
+                <th className="px-6 py-4">Category</th>
+                <th className="px-6 py-4">Slug</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-800/50">
+              {isCategoriesLoading ? (
                 <tr>
-                  <th className="px-6 py-4">Category</th>
-                  <th className="px-6 py-4">Slug</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <td
+                    colSpan="6"
+                    className="px-6 py-20 text-center text-gray-400"
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+                      Loading categories...
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-800/50">
-                {categories.map((category) => (
+              ) : categories.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="px-6 py-20 text-center text-gray-400"
+                  >
+                    No categories found.
+                  </td>
+                </tr>
+              ) : (
+                categories.map((category) => (
                   <tr
                     key={category._id}
                     className="group transition hover:bg-emerald-500/5"
@@ -274,11 +286,11 @@ const AdminCategoriesPage = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   );

@@ -694,23 +694,42 @@ const AdminProductsPage = () => {
           </div>
         </div>
 
-        {isProductsLoading ? (
-          <p className="text-gray-400">Loading...</p>
-        ) : (
-          <div className="overflow-x-auto rounded-2xl border border-gray-800 bg-gray-950/40">
-            <table className="w-full text-left">
-              <thead className="bg-gray-900/50 text-xs font-semibold uppercase text-gray-400">
+        <div className="overflow-x-auto rounded-2xl border border-gray-800 bg-gray-950/40">
+          <table className="w-full text-left">
+            <thead className="bg-gray-900/50 text-xs font-semibold uppercase text-gray-400">
+              <tr>
+                <th className="px-6 py-4">Product</th>
+                <th className="px-6 py-4">Category</th>
+                <th className="px-6 py-4">Price</th>
+                <th className="px-6 py-4">Stock</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-800/50 text-sm">
+              {isProductsLoading ? (
                 <tr>
-                  <th className="px-6 py-4">Product</th>
-                  <th className="px-6 py-4">Category</th>
-                  <th className="px-6 py-4">Price</th>
-                  <th className="px-6 py-4">Stock</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <td
+                    colSpan="6"
+                    className="px-6 py-20 text-center text-gray-400"
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+                      Loading products...
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-800/50 text-sm">
-                {products.map((p) => (
+              ) : products.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="px-6 py-20 text-center text-gray-400"
+                  >
+                    No products found.
+                  </td>
+                </tr>
+              ) : (
+                products.map((p) => (
                   <tr
                     key={p._id}
                     className="group hover:bg-emerald-500/5 transition"
@@ -766,11 +785,11 @@ const AdminProductsPage = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   );
