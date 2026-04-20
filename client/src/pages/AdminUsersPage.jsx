@@ -40,29 +40,25 @@ const AdminUsersPage = () => {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-3xl border border-gray-800 bg-gray-900/70 p-6 shadow-2xl shadow-emerald-950/20">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="rounded-2xl bg-emerald-500/20 p-3 text-emerald-300">
-            <Users size={20} />
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold text-white">Manage Users</h2>
-            <p className="text-sm text-gray-400">
-              View and manage registered users, update roles, or remove
-              accounts.
-            </p>
-          </div>
+      <div className="mb-6 flex items-center gap-3">
+        <div className="rounded-2xl bg-emerald-500/20 p-3 text-emerald-300">
+          <Users size={24} />
         </div>
+        <div>
+          <h2 className="text-2xl font-semibold text-white">Manage Users</h2>
+        </div>
+      </div>
 
+      <section className="rounded-3xl border border-gray-800 bg-gray-900/40 backdrop-blur-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-gray-800 text-sm font-medium text-gray-400">
-                <th className="px-4 py-3">User</th>
-                <th className="px-4 py-3">Email</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3">Joined</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+              <tr className="border-b border-gray-800 bg-gray-800/30 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                <th className="px-6 py-4">User</th>
+                <th className="px-6 py-4">Email</th>
+                <th className="px-6 py-4 text-center">Role</th>
+                <th className="px-6 py-4 text-center">Joined</th>
+                <th className="px-6 py-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800">
@@ -113,9 +109,9 @@ const AdminUsersPage = () => {
                     <td className="px-4 py-4 text-sm text-gray-300">
                       {user.email}
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-4 py-4 text-center">
                       <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                        className={` inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                           user.role === "admin"
                             ? "bg-emerald-500/15 text-emerald-300"
                             : "bg-blue-500/15 text-blue-300"
@@ -124,11 +120,11 @@ const AdminUsersPage = () => {
                         {user.role}
                       </span>
                     </td>
-                    <td className="px-4 py-4 text-sm text-gray-400">
+                    <td className="px-4 py-4 text-sm text-gray-400 text-center">
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex justify-end gap-2">
+                    <td className="px-4 py-4 text-center">
+                      <div className="flex justify-center gap-2">
                         <button
                           onClick={() => handleToggleRole(user)}
                           disabled={isUpdatingUser}

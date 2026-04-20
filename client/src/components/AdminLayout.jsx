@@ -20,15 +20,12 @@ const AdminLayout = () => {
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="mb-2 text-sm uppercase tracking-[0.3em] text-emerald-300/70">
+            {/* <p className="mb-2 text-sm uppercase tracking-[0.3em] text-emerald-300/70">
               TrendCart Admin
-            </p>
-            <h1 className="text-4xl font-bold text-white">
-              Catalog control center
-            </h1>
+            </p> */}
+            <h1 className="text-4xl font-bold text-white">Control Center</h1>
             <p className="mt-2 max-w-2xl text-gray-300">
-              Manage categories, products, and the live storefront catalog from
-              one place.
+              Manage Categories, Products, Orders and Users in one place.
             </p>
           </div>
 
