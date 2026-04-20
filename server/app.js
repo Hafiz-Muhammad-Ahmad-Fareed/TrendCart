@@ -15,7 +15,7 @@ import { handleWebhook } from "./controllers/order.controller.js";
 
 const app = express();
 
-app.use(requestLogger);
+// app.use(requestLogger);
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 
@@ -44,6 +44,6 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api", catalogRoutes);
-app.use(errorHandlerMiddleware(logger));
+// app.use(errorHandlerMiddleware(logger));
 
 export default app;
