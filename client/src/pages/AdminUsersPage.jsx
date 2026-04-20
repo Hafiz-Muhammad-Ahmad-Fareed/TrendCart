@@ -54,26 +54,41 @@ const AdminUsersPage = () => {
           </div>
         </div>
 
-        {isUsersLoading ? (
-          <p className="text-gray-400">Loading users...</p>
-        ) : users.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-gray-700 bg-gray-950/40 p-10 text-center text-gray-400">
-            No users found.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-gray-800 text-sm font-medium text-gray-400">
-                  <th className="px-4 py-3">User</th>
-                  <th className="px-4 py-3">Email</th>
-                  <th className="px-4 py-3">Role</th>
-                  <th className="px-4 py-3">Joined</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-gray-800 text-sm font-medium text-gray-400">
+                <th className="px-4 py-3">User</th>
+                <th className="px-4 py-3">Email</th>
+                <th className="px-4 py-3">Role</th>
+                <th className="px-4 py-3">Joined</th>
+                <th className="px-4 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-800">
+              {isUsersLoading ? (
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="px-6 py-20 text-center text-gray-400"
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+                      Loading users...
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-800">
-                {users.map((user) => (
+              ) : users.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="px-6 py-20 text-center text-gray-400"
+                  >
+                    No user found.
+                  </td>
+                </tr>
+              ) : (
+                users.map((user) => (
                   <tr key={user._id} className="group hover:bg-gray-800/30">
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
@@ -138,11 +153,11 @@ const AdminUsersPage = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   );
