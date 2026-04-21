@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Package,
@@ -6,6 +6,8 @@ import {
   Users,
   ShoppingCart,
   DollarSign,
+  Calendar,
+  Filter,
 } from "lucide-react";
 import {
   LineChart,
@@ -30,10 +32,48 @@ const AdminDashboardPage = () => {
   const { counts, analytics, isDashboardLoading, fetchDashboard } =
     useAdminStore();
 
+  const [filters, setFilters] = useState({
+    year: new Date().getFullYear().toString(),
+    month: "",
+    range: "",
+  });
+
   useEffect(() => {
-    fetchDashboard();
-  }, [fetchDashboard]);
-  console.log(analytics);
+    fetchDashboard(filters);
+  }, [fetchDashboard, filters]);
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => {
+      const newFilters = { ...prev, [name]: value };
+      if (name === "range" && value === "7days") {
+        newFilters.year = "";
+        newFilters.month = "";
+      } else if (name === "year" || name === "month") {
+        newFilters.range = "";
+      }
+      return newFilters;
+    });
+  };
+
+  const years = Array.from({ length: 5 }, (_, i) =>
+    (new Date().getFullYear() - i).toString(),
+  );
+  const months = [
+    { value: "1", label: "January" },
+    { value: "2", label: "February" },
+    { value: "3", label: "March" },
+    { value: "4", label: "April" },
+    { value: "5", label: "May" },
+    { value: "6", label: "June" },
+    { value: "7", label: "July" },
+    { value: "8", label: "August" },
+    { value: "9", label: "September" },
+    { value: "10", label: "October" },
+    { value: "11", label: "November" },
+    { value: "12", label: "December" },
+  ];
+
   const stats = [
     {
       label: "Total Revenue",
@@ -63,6 +103,73 @@ const AdminDashboardPage = () => {
 
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
+      {/* Filters */}
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4 bg-gray-800/50 p-4 rounded-xl border border-gray-700 backdrop-blur-md">
+        <div className="flex items-center gap-2 text-emerald-400">
+          <Filter size={20} />
+          <span className="font-semibold text-sm uppercase tracking-wider">
+            Filters:
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-4">
+          <select
+            name="range"
+            value={filters.range}
+            onChange={handleFilterChange}
+            className="border border-gray-700 bg-gray-900/60 text-white text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5"
+          >
+            <option value="">Select Range</option>
+            <option value="7days">Last 7 Days</option>
+          </select>
+
+          <div className="h-6 w-px bg-gray-700 hidden sm:block"></div>
+
+          <select
+            name="year"
+            value={filters.year}
+            onChange={handleFilterChange}
+            className="border border-gray-700 bg-gray-900/60 text-white text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5"
+          >
+            <option value="">Select Year</option>
+            {years.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+
+          <select
+            name="month"
+            value={filters.month}
+            onChange={handleFilterChange}
+            className="border border-gray-700 bg-gray-900/60 text-white text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5"
+          >
+            <option value="">Full Year</option>
+            {months.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
+            ))}
+          </select>
+
+          {(filters.year || filters.month || filters.range) && (
+            <button
+              onClick={() =>
+                setFilters({
+                  year: new Date().getFullYear().toString(),
+                  month: "",
+                  range: "",
+                })
+              }
+              className="text-xs text-gray-400 hover:text-white transition-colors underline underline-offset-4"
+            >
+              Reset Filters
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-6 mb-12 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
@@ -90,7 +197,16 @@ const AdminDashboardPage = () => {
         {/* Sales Over Time - Line Chart */}
         <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700 backdrop-blur-md">
           <h3 className="text-lg font-semibold mb-6 text-emerald-400">
-            Sales Over Time (Last 7 Days)
+            Sales Over Time{" "}
+            {filters.range === "7days"
+              ? "(Last 7 Days)"
+              : filters.month
+                ? `(${
+                    months.find((m) => m.value === filters.month)?.label
+                  } ${filters.year})`
+                : filters.year
+                  ? `(${filters.year})`
+                  : "(Last 7 Days)"}
           </h3>
           <div className="h-80 w-full">
             {analytics?.salesOverTime ? (

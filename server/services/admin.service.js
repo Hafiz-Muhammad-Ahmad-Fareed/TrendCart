@@ -115,6 +115,28 @@ const validateProduct = (body) => {
 };
 
 export const getDashboardStats = async (req, res) => {
+  const { year, month, range } = req.query;
+
+  let startDate, endDate;
+
+  if (range === "7days") {
+    endDate = new Date();
+    endDate.setUTCHours(23, 59, 59, 999);
+    startDate = new Date(endDate);
+    startDate.setUTCDate(startDate.getUTCDate() - 6);
+    startDate.setUTCHours(0, 0, 0, 0);
+  } else if (year) {
+    const y = parseInt(year);
+    if (month) {
+      const m = parseInt(month) - 1; // month is 1-indexed from query
+      startDate = new Date(Date.UTC(y, m, 1, 0, 0, 0, 0));
+      endDate = new Date(Date.UTC(y, m + 1, 0, 23, 59, 59, 999));
+    } else {
+      startDate = new Date(Date.UTC(y, 0, 1, 0, 0, 0, 0));
+      endDate = new Date(Date.UTC(y, 11, 31, 23, 59, 59, 999));
+    }
+  }
+
   const [categories, products, activeProducts, users] = await Promise.all([
     categoryRepository.countDocuments(),
     productRepository.countDocuments(),
@@ -122,7 +144,7 @@ export const getDashboardStats = async (req, res) => {
     userRepository.countDocuments(),
   ]);
 
-  const orders = await orderRepository.findAll();
+  const orders = await orderRepository.findAll({ startDate, endDate });
   const totalOrders = orders.length;
 
   // Analytics Calculations
@@ -133,26 +155,88 @@ export const getDashboardStats = async (req, res) => {
     return sum;
   }, 0);
 
-  // 1. Sales over time (last 7 days)
-  const last7Days = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    last7Days.push({
-      date: d.toISOString().split("T")[0],
-      sales: 0,
-    });
-  }
+  // 1. Sales over time
+  // If Last 7 Days is selected, show last 7 days.
+  // If Month is selected, show all days of that month.
+  // If Year is selected (and no month), show months of that year.
+  let salesOverTime = [];
 
-  orders.forEach((order) => {
-    if (order.paymentStatus === "paid") {
-      const orderDate = new Date(order.createdAt).toISOString().split("T")[0];
-      const dayData = last7Days.find((d) => d.date === orderDate);
-      if (dayData) {
-        dayData.sales += order.totalAmount;
-      }
+  if (range === "7days" || (year && month)) {
+    // Show days
+    const daysCount = range === "7days" ? 7 : new Date(year, month, 0).getDate();
+    const tempStartDate = new Date(startDate);
+
+    for (let i = 0; i < daysCount; i++) {
+      const d = new Date(tempStartDate);
+      d.setUTCDate(d.getUTCDate() + i);
+      salesOverTime.push({
+        date: d.toISOString().split("T")[0],
+        sales: 0,
+      });
     }
-  });
+
+    orders.forEach((order) => {
+      if (order.paymentStatus === "paid") {
+        const orderDate = new Date(order.createdAt).toISOString().split("T")[0];
+        const dayData = salesOverTime.find((d) => d.date === orderDate);
+        if (dayData) {
+          dayData.sales += order.totalAmount;
+        }
+      }
+    });
+  } else if (year && !month) {
+    // Show months of the year
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    salesOverTime = monthNames.map((name) => ({ date: name, sales: 0 }));
+
+    orders.forEach((order) => {
+      if (order.paymentStatus === "paid") {
+        const orderMonth = new Date(order.createdAt).getUTCMonth();
+        salesOverTime[orderMonth].sales += order.totalAmount;
+      }
+    });
+  } else {
+    // Default to last 7 days if no filter
+    const last7Days = [];
+    const end = new Date();
+    end.setUTCHours(23, 59, 59, 999);
+    const start = new Date(end);
+    start.setUTCDate(start.getUTCDate() - 6);
+    start.setUTCHours(0, 0, 0, 0);
+
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start);
+      d.setUTCDate(d.getUTCDate() + i);
+      last7Days.push({
+        date: d.toISOString().split("T")[0],
+        sales: 0,
+      });
+    }
+
+    orders.forEach((order) => {
+      if (order.paymentStatus === "paid") {
+        const orderDate = new Date(order.createdAt).toISOString().split("T")[0];
+        const dayData = last7Days.find((d) => d.date === orderDate);
+        if (dayData) {
+          dayData.sales += order.totalAmount;
+        }
+      }
+    });
+    salesOverTime = last7Days;
+  }
 
   // 2. Order status distribution
   const statusDistribution = [
@@ -171,15 +255,7 @@ export const getDashboardStats = async (req, res) => {
     }
   });
 
-  // 3. Revenue by category
-  // Since order items don't have category info directly, we'd need to populate or look up.
-  // For now, let's group by status or some other available metric if category is hard.
-  // Actually, let's try to get category if possible.
-  const categoryRevenueMap = {};
-
-  // We need to fetch products to know their categories if we want accurate data.
-  // Or we can assume items in orders might have category if we populated it.
-  // Let's do a simple top products by revenue instead if category is too complex to fetch here efficiently.
+  // 3. Top products by revenue
   const productRevenueMap = {};
   orders.forEach((order) => {
     if (order.paymentStatus === "paid") {
@@ -207,7 +283,7 @@ export const getDashboardStats = async (req, res) => {
       totalRevenue,
     },
     analytics: {
-      salesOverTime: last7Days,
+      salesOverTime,
       statusDistribution,
       topProducts,
     },

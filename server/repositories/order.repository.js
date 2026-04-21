@@ -16,8 +16,17 @@ const orderRepository = {
   async findByUserId(userId) {
     return Order.find({ user: userId }).sort({ createdAt: -1 }).lean();
   },
-  async findAll() {
-    return Order.find()
+  async findAll(filters = {}) {
+    const query = {};
+
+    if (filters.startDate && filters.endDate) {
+      query.createdAt = {
+        $gte: filters.startDate,
+        $lte: filters.endDate,
+      };
+    }
+
+    return Order.find(query)
       .populate("user", "fullName email")
       .sort({ createdAt: -1 })
       .lean();

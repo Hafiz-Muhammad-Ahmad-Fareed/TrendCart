@@ -73,11 +73,16 @@ const useAdminStore = create((set, get) => ({
   isUpdatingOrder: false,
   isDeleting: false,
 
-  fetchDashboard: async () => {
+  fetchDashboard: async (filters = {}) => {
     set({ isDashboardLoading: true });
 
     try {
-      const res = await axiosInstance.get("/admin/dashboard");
+      const params = {};
+      if (filters.year) params.year = filters.year;
+      if (filters.month) params.month = filters.month;
+      if (filters.range) params.range = filters.range;
+
+      const res = await axiosInstance.get("/admin/dashboard", { params });
 
       set({ counts: res.data.counts, analytics: res.data.analytics });
     } catch (error) {

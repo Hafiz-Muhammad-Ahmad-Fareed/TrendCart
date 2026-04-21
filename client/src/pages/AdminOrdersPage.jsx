@@ -191,7 +191,7 @@ const AdminOrdersPage = () => {
             />
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative">
               <Filter
                 className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
