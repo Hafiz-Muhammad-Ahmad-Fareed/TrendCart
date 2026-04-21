@@ -242,7 +242,7 @@ const AdminCategoriesPage = () => {
                 <tr>
                   <td
                     colSpan="4"
-                    className="px-6 py-20 text-center text-gray-400"
+                    className="px-6 py-20 text-center text-gray-400 italic"
                   >
                     No categories found matching your criteria.
                   </td>

@@ -272,7 +272,7 @@ const AdminOrdersPage = () => {
                 <tr>
                   <td
                     colSpan="6"
-                    className="px-6 py-20 text-center text-gray-400"
+                    className="px-6 py-20 text-center text-gray-400 italic"
                   >
                     No orders found matching your criteria.
                   </td>
