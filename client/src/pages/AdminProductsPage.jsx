@@ -50,6 +50,7 @@ const AdminProductsPage = () => {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState("");
 
   const fileInputRef = useRef(null);
   const modalRef = useRef(null);
@@ -57,13 +58,39 @@ const AdminProductsPage = () => {
   // --- Logic & Filtering ---
   const filteredProducts = useMemo(() => {
     const searchLower = searchTerm.toLowerCase();
-    return products.filter((product) => {
+
+    let result = [...products].filter((product) => {
       return (
         product.name.toLowerCase().includes(searchLower) ||
         (product.slug && product.slug.toLowerCase().includes(searchLower))
       );
     });
-  }, [products, searchTerm]);
+
+    switch (sortOption) {
+      case "priceLowHigh":
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case "priceHighLow":
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case "stockLowHigh":
+        result.sort((a, b) => a.stockQuantity - b.stockQuantity);
+        break;
+      case "stockHighLow":
+        result.sort((a, b) => b.stockQuantity - a.stockQuantity);
+        break;
+      case "nameAZ":
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "nameZA":
+        result.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      default:
+        break;
+    }
+
+    return result;
+  }, [products, searchTerm, sortOption]);
 
   const activeFilters = useMemo(
     () => ({
@@ -160,16 +187,28 @@ const AdminProductsPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isModalOpen]);
+
   return (
     <div className="relative min-h-screen flex flex-col gap-6 text-white">
-      {/* 1. MODAL SECTION */}
+      {/* Product MODAL SECTION */}
       {isModalOpen && (
-        <section className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+        <section className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div
             ref={modalRef}
-            className="w-full max-w-2xl bg-gray-900 border border-gray-800 rounded-3xl p-6 md:p-8 shadow-2xl"
+            className="custom-scrollbar overflow-y-auto mt-15 flex flex-col w-full max-w-md max-h-[80vh] rounded-3xl border border-gray-800 bg-gray-900 p-6 shadow-2xl animate-in fade-in zoom-in duration-200"
           >
-            <div className="mb-6 flex items-center justify-between">
+            <div className=" mb-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="rounded-2xl bg-emerald-500/20 p-3 text-emerald-300">
                   <Package size={20} />
@@ -249,9 +288,9 @@ const AdminProductsPage = () => {
                   setForm((c) => ({ ...c, categoryId: e.target.value }))
                 }
                 required
-                className={`${selectClasses} w-full ${!form.categoryId ? "text-gray-500" : "text-white"}`}
+                className={`${selectClasses} border border-gray-700 bg-gray-950/80 w-full py-2.5 ${!form.categoryId ? "text-gray-500" : "text-white"}`}
               >
-                <option value="" className="bg-gray-900">
+                <option value="" className="">
                   Select category
                 </option>
                 {categories.map((cat) => (
@@ -266,38 +305,68 @@ const AdminProductsPage = () => {
               </select>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <select
-                  value={form.status}
-                  onChange={(e) =>
-                    setForm((c) => ({ ...c, status: e.target.value }))
-                  }
-                  className={`${selectClasses} w-full text-white`}
-                >
-                  <option value="active" className="bg-gray-900">
-                    Active
-                  </option>
-                  <option value="inactive" className="bg-gray-900">
-                    Inactive
-                  </option>
-                </select>
-
-                <label className="flex items-center gap-3 rounded-2xl border border-gray-700 bg-gray-950/80 px-4 py-3 text-sm text-gray-300 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.isFeatured}
-                    onChange={(e) =>
-                      setForm((c) => ({ ...c, isFeatured: e.target.checked }))
+                {/* Status Toggle */}
+                <div className="flex items-center gap-3 px-1">
+                  <label className="text-sm text-gray-400 flex-1">
+                    Status:
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setForm((c) => ({
+                        ...c,
+                        status: c.status === "active" ? "inactive" : "active",
+                      }))
                     }
-                    className="h-5 w-5 accent-emerald-500 rounded border-gray-700 bg-gray-900"
-                  />
-                  Featured Product
-                </label>
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                      form.status === "active"
+                        ? "bg-emerald-500"
+                        : "bg-gray-700"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        form.status === "active"
+                          ? "translate-x-6"
+                          : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                  <span className="text-xs font-medium text-white w-12">
+                    {form.status === "active" ? "Active" : "Inactive"}
+                  </span>
+                </div>
+
+                {/* Featured Toggle */}
+                <div className="flex items-center gap-3 px-1">
+                  <span className="text-sm text-gray-400 flex-1">
+                    Featured:
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setForm((c) => ({ ...c, isFeatured: !c.isFeatured }))
+                    }
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                      form.isFeatured ? "bg-emerald-500" : "bg-gray-700"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        form.isFeatured ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                  <span className="text-xs font-medium text-white w-12">
+                    {form.isFeatured ? "Yes" : "No"}
+                  </span>
+                </div>
               </div>
 
               {/* IMAGE PREVIEW */}
               {(form.image || form.imageFile) && (
                 <div className="flex items-center gap-4 p-4 rounded-2xl border border-gray-700 bg-gray-950/50">
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-gray-700">
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-gray-700">
                     <img
                       src={
                         form.imageFile
@@ -308,16 +377,22 @@ const AdminProductsPage = () => {
                       className="h-full w-full object-cover"
                     />
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setForm((c) => ({ ...c, image: "", imageFile: null }));
-                      if (fileInputRef.current) fileInputRef.current.value = "";
-                    }}
-                    className="text-xs text-red-400 hover:text-red-300 transition"
-                  >
-                    Remove Image
-                  </button>
+                  <div>
+                    <p className="text-xs font-medium text-white">
+                      Product Image
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForm((c) => ({ ...c, image: "", imageFile: null }));
+                        if (fileInputRef.current)
+                          fileInputRef.current.value = "";
+                      }}
+                      className="text-xs text-red-400 hover:text-red-300 transition"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -361,23 +436,25 @@ const AdminProductsPage = () => {
 
       {/* 2. HEADER SECTION */}
       <section className="flex flex-col gap-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
             <div className="rounded-2xl bg-blue-500/20 p-3 text-blue-400">
               <Package size={24} />
             </div>
             <h2 className="text-3xl font-bold">Products Management</h2>
           </div>
-          <button
-            onClick={() => {
-              resetForm();
-              setIsModalOpen(true);
-            }}
-            className="flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400 shadow-lg shadow-emerald-500/20"
-          >
-            <Plus size={18} />
-            Add Product
-          </button>
+          <div>
+            <button
+              onClick={() => {
+                resetForm();
+                setIsModalOpen(true);
+              }}
+              className="flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-400 shadow-lg shadow-emerald-500/20"
+            >
+              <Plus size={18} />
+              Add Product
+            </button>
+          </div>
         </div>
 
         {/* 3. SUMMARY CARDS (Integrated Component) */}
@@ -414,7 +491,7 @@ const AdminProductsPage = () => {
       </section>
 
       {/* 4. FILTERS & SEARCH */}
-      <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <section className="flex flex-col gap-3 sm:flex-row justify-between">
         <div className="relative">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -425,10 +502,29 @@ const AdminProductsPage = () => {
             placeholder="Search products..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-xl border border-gray-700 bg-gray-900/60 py-2.5 pl-10 pr-4 text-sm text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none sm:w-80"
+            className="w-full rounded-xl border border-gray-700 bg-gray-900/60 py-2.5 pl-10 pr-4 text-sm text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none sm:w-60 md:w-80"
           />
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative">
+            <Filter
+              className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+              size={18}
+            />
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              className={`${selectClasses} py-2.5 pr-10 pl-10 w-full sm:w-44 text-sm border-gray-700 bg-gray-900/60`}
+            >
+              <option value="">Sort By</option>
+              <option value="priceLowHigh">Price: Low → High</option>
+              <option value="priceHighLow">Price: High → Low</option>
+              <option value="stockLowHigh">Stock: Low → High</option>
+              <option value="stockHighLow">Stock: High → Low</option>
+              <option value="nameAZ">Name: A → Z</option>
+              <option value="nameZA">Name: Z → A</option>
+            </select>
+          </div>
           <div className="relative">
             <Filter
               className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
@@ -437,7 +533,7 @@ const AdminProductsPage = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className={`${selectClasses} py-2.5 w-40 text-sm border-gray-700 bg-gray-900/60 pr-10 pl-10`}
+              className={`${selectClasses} w-full sm:w-40 py-2.5 text-sm border-gray-700 bg-gray-900/60 pr-10 pl-10`}
             >
               <option value="">All Status</option>
               <option value="active">Active</option>
@@ -452,7 +548,7 @@ const AdminProductsPage = () => {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className={`${selectClasses} py-2.5 pr-10 pl-10 w-48 text-sm border-gray-700 bg-gray-900/60`}
+              className={`${selectClasses} py-2.5 pr-10 pl-10 w-full sm:w-34 md:w-48 text-sm border-gray-700 bg-gray-900/60`}
             >
               <option value="">All Categories</option>
               {categories.map((cat) => (

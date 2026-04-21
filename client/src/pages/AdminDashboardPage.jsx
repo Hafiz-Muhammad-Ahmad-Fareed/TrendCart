@@ -33,7 +33,7 @@ const AdminDashboardPage = () => {
   useEffect(() => {
     fetchDashboard();
   }, [fetchDashboard]);
-
+  console.log(analytics);
   const stats = [
     {
       label: "Total Revenue",

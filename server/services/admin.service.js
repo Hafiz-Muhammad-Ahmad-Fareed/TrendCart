@@ -176,14 +176,14 @@ export const getDashboardStats = async (req, res) => {
   // For now, let's group by status or some other available metric if category is hard.
   // Actually, let's try to get category if possible.
   const categoryRevenueMap = {};
-  
+
   // We need to fetch products to know their categories if we want accurate data.
   // Or we can assume items in orders might have category if we populated it.
   // Let's do a simple top products by revenue instead if category is too complex to fetch here efficiently.
   const productRevenueMap = {};
-  orders.forEach(order => {
+  orders.forEach((order) => {
     if (order.paymentStatus === "paid") {
-      order.items.forEach(item => {
+      order.items.forEach((item) => {
         if (!productRevenueMap[item.name]) {
           productRevenueMap[item.name] = 0;
         }
