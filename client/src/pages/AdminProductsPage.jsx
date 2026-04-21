@@ -645,7 +645,7 @@ const AdminProductsPage = () => {
                 <tr>
                   <td
                     colSpan="8"
-                    className="py-24 text-center text-gray-500 italic"
+                    className="py-24 text-center text-gray-400 italic"
                   >
                     No products match filters.
                   </td>
