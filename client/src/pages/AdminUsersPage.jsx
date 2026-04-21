@@ -44,9 +44,7 @@ const AdminUsersPage = () => {
         <div className="rounded-2xl bg-emerald-500/20 p-3 text-emerald-300">
           <Users size={24} />
         </div>
-        <div>
-          <h2 className="text-2xl font-semibold text-white">Manage Users</h2>
-        </div>
+        <h2 className="text-3xl font-bold">Manage Users</h2>
       </div>
 
       <section className="rounded-3xl border border-gray-800 bg-gray-900/40 backdrop-blur-sm overflow-hidden">
@@ -129,7 +127,7 @@ const AdminUsersPage = () => {
                           onClick={() => handleToggleRole(user)}
                           disabled={isUpdatingUser}
                           title={`Change to ${user.role === "admin" ? "user" : "admin"}`}
-                          className="rounded-xl border border-gray-700 p-2 text-gray-400 transition hover:border-emerald-500 hover:text-emerald-300 disabled:opacity-50"
+                          className="rounded-lg border border-gray-700 bg-gray-800/50 p-2 text-gray-400 transition hover:border-emerald-500 hover:text-emerald-300 disabled:opacity-30"
                         >
                           <ShieldCheck size={18} />
                         </button>
@@ -142,7 +140,7 @@ const AdminUsersPage = () => {
                           }
                           disabled={isDeleting}
                           title="Delete user"
-                          className="rounded-xl border border-gray-700 p-2 text-gray-400 transition hover:border-red-500 hover:text-red-400 disabled:opacity-50"
+                          className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-700 bg-gray-800/50 text-gray-400 transition hover:border-red-500/50 hover:text-red-400 disabled:opacity-30"
                         >
                           <Trash2 size={18} />
                         </button>
