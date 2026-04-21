@@ -48,3 +48,58 @@ export const resolveImageUpload = async ({ file, image, folder }) => {
 
   return null;
 };
+
+export const resolveMultipleImagesUpload = async ({
+  files,
+  images,
+  folder,
+}) => {
+  const uploadPromises = [];
+
+  // Handle multiple files from multipart/form-data
+  if (Array.isArray(files) && files.length > 0) {
+    for (const file of files) {
+      if (file.buffer) {
+        uploadPromises.push(uploadBuffer(file.buffer, folder));
+      }
+    }
+  } else if (files?.buffer) {
+    // Single file that might come as object instead of array
+    uploadPromises.push(uploadBuffer(files.buffer, folder));
+  }
+
+  // Handle multiple images from JSON body (URLs or Base64)
+  if (Array.isArray(images)) {
+    for (const img of images) {
+      if (typeof img === "string" && img.trim()) {
+        const trimmedImg = img.trim();
+        if (
+          trimmedImg.startsWith("http://") ||
+          trimmedImg.startsWith("https://")
+        ) {
+          uploadPromises.push(Promise.resolve(trimmedImg));
+        } else if (trimmedImg.startsWith("data:image/")) {
+          uploadPromises.push(
+            cloudinary.uploader
+              .upload(trimmedImg, { folder })
+              .then((res) => res.secure_url),
+          );
+        }
+      }
+    }
+  } else if (typeof images === "string" && images.trim()) {
+    // Single image from JSON body
+    const trimmedImg = images.trim();
+    if (trimmedImg.startsWith("http://") || trimmedImg.startsWith("https://")) {
+      uploadPromises.push(Promise.resolve(trimmedImg));
+    } else if (trimmedImg.startsWith("data:image/")) {
+      uploadPromises.push(
+        cloudinary.uploader
+          .upload(trimmedImg, { folder })
+          .then((res) => res.secure_url),
+      );
+    }
+  }
+
+  return Promise.all(uploadPromises);
+};

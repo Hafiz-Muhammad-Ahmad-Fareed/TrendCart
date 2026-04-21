@@ -55,9 +55,9 @@ const CategoryPage = () => {
                     className="group overflow-hidden rounded-4xl border border-gray-800 bg-gray-900/70 shadow-2xl shadow-emerald-950/10 transition hover:border-emerald-500/50"
                   >
                     <div className="h-72 overflow-hidden bg-linear-to-br from-emerald-700/40 to-gray-950">
-                      {product.image ? (
+                      {product.images?.[0] || product.image ? (
                         <img
-                          src={product.image}
+                          src={product.images?.[0] || product.image}
                           alt={product.name}
                           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                         />

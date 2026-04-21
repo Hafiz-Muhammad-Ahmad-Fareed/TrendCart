@@ -8,8 +8,7 @@ const Navbar = () => {
   const { user } = useUserStore();
   const { cart } = useCartStore();
 
-  const cartItemsCount =
-    cart?.reduce((acc, item) => acc + item.quantity, 0) || 0;
+  const cartItemsCount = cart?.length || 0;
 
   return (
     <header className="fixed top-0 left-0 z-40 w-full border-b border-emerald-800 bg-gray-900/90 shadow-lg backdrop-blur-md transition-all duration-300">

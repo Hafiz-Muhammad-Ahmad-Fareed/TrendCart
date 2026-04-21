@@ -39,10 +39,26 @@ const buildProductFormData = (payload) => {
   appendValue(formData, "isFeatured", String(payload.isFeatured));
   appendValue(formData, "status", payload.status);
 
-  if (payload.imageFile) {
-    appendValue(formData, "image", payload.imageFile);
-  } else if (payload.image) {
-    appendValue(formData, "image", payload.image);
+  if (payload.sizes) {
+    appendValue(formData, "sizes", payload.sizes);
+  }
+
+  if (payload.colors) {
+    appendValue(formData, "colors", payload.colors);
+  }
+
+  if (Array.isArray(payload.imageFiles) && payload.imageFiles.length > 0) {
+    payload.imageFiles.forEach((file) => {
+      formData.append("images", file);
+    });
+  }
+
+  if (Array.isArray(payload.images)) {
+    payload.images.forEach((img) => {
+      formData.append("images", img);
+    });
+  } else if (payload.images) {
+    formData.append("images", payload.images);
   }
 
   return formData;

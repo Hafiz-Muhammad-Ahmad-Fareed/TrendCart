@@ -10,17 +10,34 @@ const shapeCategory = (category) => ({
   isActive: category.isActive,
 });
 
-const shapeProduct = (product) => ({
-  _id: product._id,
-  name: product.name,
-  slug: product.slug,
-  description: product.description,
-  price: product.price,
-  image: product.image,
-  stockQuantity: product.stockQuantity,
-  isFeatured: product.isFeatured,
-  status: product.status,
-});
+const shapeProduct = (product) => {
+  const images = Array.isArray(product.images) ? [...product.images] : [];
+  if (product.image && !images.includes(product.image)) {
+    images.unshift(product.image);
+  }
+
+  return {
+    _id: product._id,
+    name: product.name,
+    slug: product.slug,
+    description: product.description,
+    price: product.price,
+    images: images,
+    sizes: product.sizes || [],
+    colors: product.colors || [],
+    stockQuantity: product.stockQuantity,
+    isFeatured: product.isFeatured,
+    status: product.status,
+    category: product.category
+      ? {
+          _id: product.category._id,
+          name: product.category.name,
+          slug: product.category.slug,
+          isActive: product.category.isActive,
+        }
+      : null,
+  };
+};
 
 export const getPublicCategories = async (req, res) => {
   const categories = await categoryRepository.findPublic();

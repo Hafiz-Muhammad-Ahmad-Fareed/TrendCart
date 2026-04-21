@@ -25,10 +25,17 @@ const productSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
-    image: {
-      type: String,
-      default: "",
-      trim: true,
+    images: {
+      type: [String],
+      default: [],
+    },
+    sizes: {
+      type: [String],
+      default: [],
+    },
+    colors: {
+      type: [String],
+      default: [],
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,

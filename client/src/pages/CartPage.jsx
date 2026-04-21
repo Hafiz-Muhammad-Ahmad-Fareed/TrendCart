@@ -55,14 +55,14 @@ const CartPage = () => {
             <div className="space-y-6 lg:col-span-2">
               {cartItems.map((item) => (
                 <div
-                  key={item.product._id}
+                  key={`${item.product._id}-${item.selectedSize || "nosize"}-${item.selectedColor || "nocolor"}-${item.selectedImage || "noimage"}`}
                   className="flex flex-col gap-6 rounded-3xl border border-gray-800 bg-gray-900/70 p-6 sm:flex-row sm:items-center"
                 >
                   {/* Product Image */}
                   <div className="h-32 w-full overflow-hidden rounded-2xl bg-gray-800 sm:h-24 sm:w-24">
-                    {item.product.image ? (
+                    {item.selectedImage || item.product.images?.[0] || item.product.image ? (
                       <img
-                        src={item.product.image}
+                        src={item.selectedImage || item.product.images?.[0] || item.product.image}
                         alt={item.product.name}
                         className="h-full w-full object-cover"
                       />
@@ -85,6 +85,10 @@ const CartPage = () => {
                       <p className="text-sm text-gray-400">
                         ${Number(item.product.price).toFixed(2)} each
                       </p>
+                      <p className="text-sm text-gray-400">
+                        Size: {item.selectedSize || "N/A"} • Color:{" "}
+                        {item.selectedColor || "N/A"}
+                      </p>
                     </div>
 
                     <div className="flex items-center gap-6">
@@ -92,7 +96,13 @@ const CartPage = () => {
                       <div className="flex items-center rounded-xl border border-gray-700 bg-gray-800/50 p-1">
                         <button
                           onClick={() =>
-                            updateQuantity(item.product._id, item.quantity - 1)
+                            updateQuantity(
+                              item.product._id,
+                              item.quantity - 1,
+                              item.selectedSize || "",
+                              item.selectedColor || "",
+                              item.selectedImage || "",
+                            )
                           }
                           disabled={item.quantity <= 1}
                           className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-700 hover:text-white disabled:opacity-30"
@@ -104,7 +114,13 @@ const CartPage = () => {
                         </span>
                         <button
                           onClick={() =>
-                            updateQuantity(item.product._id, item.quantity + 1)
+                            updateQuantity(
+                              item.product._id,
+                              item.quantity + 1,
+                              item.selectedSize || "",
+                              item.selectedColor || "",
+                              item.selectedImage || "",
+                            )
                           }
                           className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-700 hover:text-white"
                         >
@@ -119,7 +135,14 @@ const CartPage = () => {
                       </div>
 
                       <button
-                        onClick={() => removeFromCart(item.product._id)}
+                        onClick={() =>
+                          removeFromCart(
+                            item.product._id,
+                            item.selectedSize || "",
+                            item.selectedColor || "",
+                            item.selectedImage || "",
+                          )
+                        }
                         className="text-gray-500 transition hover:text-red-500"
                         title="Remove item"
                       >

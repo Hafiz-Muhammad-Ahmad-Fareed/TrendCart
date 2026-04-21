@@ -11,35 +11,82 @@ const useCartStore = create(
 
       addToCart: (product) => {
         set((state) => {
+          const selectedSize = product.selectedSize || "";
+          const selectedColor = product.selectedColor || "";
+          const selectedImage = product.selectedImage || "";
           const existingItem = state.cart.find(
-            (item) => item.product._id === product._id,
+            (item) =>
+              item.product._id === product._id &&
+              (item.selectedSize || "") === selectedSize &&
+              (item.selectedColor || "") === selectedColor &&
+              (item.selectedImage || "") === selectedImage,
           );
           let newCart;
           if (existingItem) {
             newCart = state.cart.map((item) =>
-              item.product._id === product._id
-                ? { ...item, quantity: item.quantity + 1 }
+              item.product._id === product._id &&
+              (item.selectedSize || "") === selectedSize &&
+              (item.selectedColor || "") === selectedColor &&
+              (item.selectedImage || "") === selectedImage
+                ? {
+                    ...item,
+                    quantity: item.quantity + 1,
+                    selectedImage: product.selectedImage || item.selectedImage,
+                  }
                 : item,
             );
           } else {
-            newCart = [...state.cart, { product, quantity: 1 }];
+            newCart = [
+              ...state.cart,
+              {
+                product,
+                quantity: 1,
+                selectedSize,
+                selectedColor,
+                selectedImage,
+              },
+            ];
           }
           toast.success("Added to cart");
           return { cart: newCart };
         });
       },
 
-      updateQuantity: (productId, quantity) => {
+      updateQuantity: (
+        productId,
+        quantity,
+        selectedSize = "",
+        selectedColor = "",
+        selectedImage = "",
+      ) => {
         set((state) => ({
           cart: state.cart.map((item) =>
-            item.product._id === productId ? { ...item, quantity } : item,
+            item.product._id === productId &&
+            (item.selectedSize || "") === selectedSize &&
+            (item.selectedColor || "") === selectedColor &&
+            (item.selectedImage || "") === selectedImage
+              ? { ...item, quantity }
+              : item,
           ),
         }));
       },
 
-      removeFromCart: (productId) => {
+      removeFromCart: (
+        productId,
+        selectedSize = "",
+        selectedColor = "",
+        selectedImage = "",
+      ) => {
         set((state) => ({
-          cart: state.cart.filter((item) => item.product._id !== productId),
+          cart: state.cart.filter(
+            (item) =>
+              !(
+                item.product._id === productId &&
+                (item.selectedSize || "") === selectedSize &&
+                (item.selectedColor || "") === selectedColor &&
+                (item.selectedImage || "") === selectedImage
+              ),
+          ),
         }));
         toast.success("Removed from cart");
       },
@@ -60,6 +107,9 @@ const useCartStore = create(
             cartItems: cart.map((item) => ({
               productId: item.product._id,
               quantity: item.quantity,
+              selectedSize: item.selectedSize,
+              selectedColor: item.selectedColor,
+              selectedImage: item.selectedImage,
             })),
           });
           if (res.data.url) {

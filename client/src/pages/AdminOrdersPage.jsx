@@ -382,7 +382,22 @@ const AdminOrdersPage = () => {
                                         <p className="text-sm font-medium text-white">
                                           {item.name}
                                         </p>
-                                        <p className="text-xs text-gray-500">
+                                        {(item.variant?.size ||
+                                          item.variant?.color) && (
+                                          <div className="flex gap-2 mt-0.5">
+                                            {item.variant.size && (
+                                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-800 text-gray-400">
+                                                Size: {item.variant.size}
+                                              </span>
+                                            )}
+                                            {item.variant.color && (
+                                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-800 text-gray-400">
+                                                Color: {item.variant.color}
+                                              </span>
+                                            )}
+                                          </div>
+                                        )}
+                                        <p className="text-xs text-gray-500 mt-0.5">
                                           Qty: {item.quantity} × $
                                           {item.price.toFixed(2)}
                                         </p>

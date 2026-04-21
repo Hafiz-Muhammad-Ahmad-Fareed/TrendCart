@@ -26,15 +26,16 @@ const emptyForm = {
   stockQuantity: "",
   isFeatured: false,
   status: "active",
-  image: "",
-  imageFile: null,
+  images: [],
+  imageFiles: [],
+  sizes: "",
+  colors: "",
 };
 
 const AdminProductsPage = () => {
   const {
     categories,
     products,
-    isCategoriesLoading,
     isProductsLoading,
     isSavingProduct,
     isDeleting,
@@ -157,8 +158,10 @@ const AdminProductsPage = () => {
       stockQuantity: String(product.stockQuantity ?? ""),
       isFeatured: Boolean(product.isFeatured),
       status: product.status || "active",
-      image: product.image || "",
-      imageFile: null,
+      images: product.images || [],
+      imageFiles: [],
+      sizes: Array.isArray(product.sizes) ? product.sizes.join(", ") : "",
+      colors: Array.isArray(product.colors) ? product.colors.join(", ") : "",
     });
     setIsModalOpen(true);
   };
@@ -257,6 +260,27 @@ const AdminProductsPage = () => {
                 placeholder="Description"
                 className="w-full rounded-2xl border border-gray-700 bg-gray-950/80 px-4 py-3 text-white outline-none transition focus:border-emerald-500"
               />
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <input
+                  type="text"
+                  value={form.sizes}
+                  onChange={(e) =>
+                    setForm((c) => ({ ...c, sizes: e.target.value }))
+                  }
+                  placeholder="Sizes (e.g. S, M, L)"
+                  className="w-full rounded-2xl border border-gray-700 bg-gray-950/80 px-4 py-3 text-white outline-none transition focus:border-emerald-500"
+                />
+                <input
+                  type="text"
+                  value={form.colors}
+                  onChange={(e) =>
+                    setForm((c) => ({ ...c, colors: e.target.value }))
+                  }
+                  placeholder="Colors (e.g. Red, Blue)"
+                  className="w-full rounded-2xl border border-gray-700 bg-gray-950/80 px-4 py-3 text-white outline-none transition focus:border-emerald-500"
+                />
+              </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <input
@@ -364,46 +388,73 @@ const AdminProductsPage = () => {
               </div>
 
               {/* IMAGE PREVIEW */}
-              {(form.image || form.imageFile) && (
-                <div className="flex items-center gap-4 p-4 rounded-2xl border border-gray-700 bg-gray-950/50">
-                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-gray-700">
-                    <img
-                      src={
-                        form.imageFile
-                          ? URL.createObjectURL(form.imageFile)
-                          : form.image
-                      }
-                      alt="Preview"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-white">
-                      Product Image
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setForm((c) => ({ ...c, image: "", imageFile: null }));
-                        if (fileInputRef.current)
-                          fileInputRef.current.value = "";
-                      }}
-                      className="text-xs text-red-400 hover:text-red-300 transition"
+              {(form.images.length > 0 || form.imageFiles.length > 0) && (
+                <div className="flex flex-wrap gap-3 p-4 rounded-2xl border border-gray-700 bg-gray-950/50">
+                  {form.images.map((img, idx) => (
+                    <div
+                      key={`img-${idx}`}
+                      className="relative h-16 w-16 overflow-hidden rounded-xl border border-gray-700"
                     >
-                      Remove
-                    </button>
-                  </div>
+                      <img
+                        src={img}
+                        alt="Preview"
+                        className="h-full w-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setForm((c) => ({
+                            ...c,
+                            images: c.images.filter((_, i) => i !== idx),
+                          }))
+                        }
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-bl-xl p-0.5 hover:bg-red-600 transition"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                  {form.imageFiles.map((file, idx) => (
+                    <div
+                      key={`file-${idx}`}
+                      className="relative h-16 w-16 overflow-hidden rounded-xl border border-gray-700"
+                    >
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt="Preview"
+                        className="h-full w-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setForm((c) => ({
+                            ...c,
+                            imageFiles: c.imageFiles.filter(
+                              (_, i) => i !== idx,
+                            ),
+                          }))
+                        }
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-bl-xl p-0.5 hover:bg-red-600 transition"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
 
               <input
                 type="file"
                 ref={fileInputRef}
+                multiple
                 accept="image/*"
                 onChange={(e) =>
                   setForm((c) => ({
                     ...c,
-                    imageFile: e.target.files?.[0] || null,
+                    imageFiles: [
+                      ...c.imageFiles,
+                      ...Array.from(e.target.files || []),
+                    ],
                   }))
                 }
                 className="w-full rounded-2xl border border-dashed border-gray-700 bg-gray-950/80 px-4 py-3 text-sm text-gray-300 file:mr-4 file:rounded-xl file:border-0 file:bg-emerald-500 file:px-4 file:py-2 file:text-white cursor-pointer"
@@ -569,6 +620,8 @@ const AdminProductsPage = () => {
               <tr className="border-b border-gray-800 bg-gray-800/30 text-xs font-semibold uppercase tracking-wider text-gray-400">
                 <th className="px-6 py-4">Product Detail</th>
                 <th className="px-6 py-4">Category</th>
+                <th className="px-6 py-4 text-center">Sizes</th>
+                <th className="px-6 py-4 text-center">Colors</th>
                 <th className="px-6 py-4 text-center">Price</th>
                 <th className="px-6 py-4 text-center">Stock</th>
                 <th className="px-6 py-4 text-center">Status</th>
@@ -578,14 +631,14 @@ const AdminProductsPage = () => {
             <tbody className="text-sm divide-y divide-gray-800/50">
               {isProductsLoading ? (
                 <tr>
-                  <td colSpan="6" className="py-24 text-center text-gray-500">
+                  <td colSpan="8" className="py-24 text-center text-gray-500">
                     Loading catalog...
                   </td>
                 </tr>
               ) : filteredProducts.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="6"
+                    colSpan="8"
                     className="py-24 text-center text-gray-500 italic"
                   >
                     No products match filters.
@@ -597,44 +650,97 @@ const AdminProductsPage = () => {
                     key={p._id}
                     className="group hover:bg-gray-800/20 transition-colors"
                   >
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className="h-14 w-14 overflow-hidden rounded-2xl border border-gray-800 bg-gray-900">
-                          {p.image ? (
-                            <img
-                              src={p.image}
-                              className="h-full w-full object-cover"
-                              alt={p.name}
-                            />
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-gray-800 bg-gray-900">
+                          {p.images && p.images.length > 0 ? (
+                            <div className="h-full w-full">
+                              <img
+                                src={p.images[0] || p.image}
+                                className="h-full w-full object-cover"
+                                alt={p.name}
+                                onError={(e) => {
+                                  if (!e.target.dataset.tried) {
+                                    e.target.dataset.tried = "true";
+                                    console.warn(
+                                      "Image failed to load:",
+                                      p.images[0] || p.image,
+                                    );
+                                  }
+                                }}
+                              />
+                              {p.images.length > 1 && (
+                                <div className="absolute bottom-0 right-0 bg-emerald-500 px-1 text-[8px] font-bold text-white shadow-sm rounded-tl-md">
+                                  +{p.images.length - 1}
+                                </div>
+                              )}
+                            </div>
                           ) : (
                             <div className="flex h-full items-center justify-center text-gray-700">
                               <ImageIcon size={24} />
                             </div>
                           )}
                         </div>
-                        <div className="flex flex-col">
-                          <span className="text-base font-bold text-gray-100 group-hover:text-emerald-400 transition-colors">
+                        <div className="flex flex-col min-w-0">
+                          <span className="truncate text-base font-bold text-gray-100 group-hover:text-emerald-400 transition-colors">
                             {p.name}
                           </span>
-                          <span className="text-xs text-gray-500 font-mono uppercase">
+                          <span className="truncate text-xs text-gray-500 font-mono uppercase">
                             {p.slug || "No-Slug"}
                           </span>
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-5">
+                    <td className="px-6 py-5">
                       <span className="inline-flex items-center gap-2 rounded-xl bg-gray-800/50 px-3 py-1.5 text-xs font-semibold text-gray-300 border border-gray-700/50">
                         <Layers size={14} />{" "}
                         {p.category?.name || "Uncategorized"}
                       </span>
                     </td>
-                    <td className="px-8 py-5 text-center font-bold text-emerald-400 text-lg">
+                    <td className="px-6 py-5">
+                      <div className="flex flex-wrap gap-1 justify-center">
+                        {p.sizes && p.sizes.length > 0 ? (
+                          p.sizes.map((s) => (
+                            <span
+                              key={s}
+                              className="text-xs rounded bg-gray-700 px-1.5 py-0.5 text-gray-300"
+                            >
+                              {s}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-gray-600 italic">
+                            N/A
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex flex-wrap gap-1.5 justify-center">
+                        {p.colors && p.colors.length > 0 ? (
+                          p.colors.map((c) => (
+                            <div
+                              key={c}
+                              style={{ backgroundColor: c.toLowerCase() }}
+                              className="group rounded px-1"
+                            >
+                              <span className="text-xs text-white">{c}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <span className="text-xs text-gray-600 italic">
+                            N/A
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 text-center font-bold text-emerald-400 text-lg">
                       $
                       {Number(p.price).toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                       })}
                     </td>
-                    <td className="px-8 py-5 text-center">
+                    <td className="px-6 py-5 text-center">
                       <div className="flex flex-col items-center">
                         <span
                           className={`text-lg font-black ${p.stockQuantity <= 5 ? "text-red-400" : "text-gray-100"}`}
@@ -648,7 +754,7 @@ const AdminProductsPage = () => {
                         )}
                       </div>
                     </td>
-                    <td className="px-8 py-5 text-center">
+                    <td className="px-6 py-5 text-center">
                       <span
                         className={`inline-flex items-center rounded-full border px-4 py-1.5 text-[10px] font-black uppercase ${getStatusStyles(p.status)}`}
                       >

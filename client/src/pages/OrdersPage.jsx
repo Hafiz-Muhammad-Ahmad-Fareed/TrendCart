@@ -172,7 +172,21 @@ const OrdersPage = () => {
                               <p className="font-medium text-white">
                                 {item.name}
                               </p>
-                              <p className="text-sm text-gray-400">
+                              {(item.variant?.size || item.variant?.color) && (
+                                <div className="flex gap-2 mt-0.5">
+                                  {item.variant.size && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-800 text-gray-400">
+                                      Size: {item.variant.size}
+                                    </span>
+                                  )}
+                                  {item.variant.color && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-800 text-gray-400">
+                                      Color: {item.variant.color}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                              <p className="text-sm text-gray-400 mt-0.5">
                                 Qty: {item.quantity} × ${item.price.toFixed(2)}
                               </p>
                             </div>
@@ -184,20 +198,42 @@ const OrdersPage = () => {
                       ))}
                     </div>
 
-                    <div className="pt-4 border-t border-gray-800 flex justify-between items-center">
-                      <div className="text-sm">
-                        <p className="text-gray-400">
+                    <div className="pt-4 border-t border-gray-800 grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                          Shipping Address
+                        </h4>
+                        {order.shippingAddress?.line1 ? (
+                          <div className="text-sm text-gray-300">
+                            <p className="text-white font-medium">
+                              {order.shippingAddress.name}
+                            </p>
+                            <p>{order.shippingAddress.line1}</p>
+                            {order.shippingAddress.line2 && (
+                              <p>{order.shippingAddress.line2}</p>
+                            )}
+                            <p>
+                              {order.shippingAddress.city},{" "}
+                              {order.shippingAddress.state}{" "}
+                              {order.shippingAddress.postal_code}
+                            </p>
+                            <p>{order.shippingAddress.country}</p>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-500 italic">
+                            No shipping information available
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2 text-right">
+                        <p className="text-gray-400 text-sm">
                           Payment Status:{" "}
                           <span
                             className={`font-semibold capitalize ${order.paymentStatus === "paid" ? "text-emerald-400" : "text-amber-400"}`}
                           >
                             {order.paymentStatus}
                           </span>
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-gray-400 text-sm">
-                          Subtotal: ${order.totalAmount.toFixed(2)}
                         </p>
                         <p className="text-xl font-bold text-emerald-400">
                           Total: ${order.totalAmount.toFixed(2)}

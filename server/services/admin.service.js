@@ -3,7 +3,10 @@ import categoryRepository from "../repositories/category.repository.js";
 import productRepository from "../repositories/product.repository.js";
 import userRepository from "../repositories/user.repository.js";
 import orderRepository from "../repositories/order.repository.js";
-import { resolveImageUpload } from "../utils/cloudinary_upload.js";
+import {
+  resolveImageUpload,
+  resolveMultipleImagesUpload,
+} from "../utils/cloudinary_upload.js";
 import { generateUniqueSlug } from "../utils/slugify.js";
 
 const parseBoolean = (value, defaultValue = false) => {
@@ -47,27 +50,36 @@ const shapeCategory = (category) => ({
   updatedAt: category.updatedAt,
 });
 
-const shapeProduct = (product) => ({
-  _id: product._id,
-  name: product.name,
-  slug: product.slug,
-  description: product.description,
-  price: product.price,
-  image: product.image,
-  stockQuantity: product.stockQuantity,
-  isFeatured: product.isFeatured,
-  status: product.status,
-  category: product.category
-    ? {
-        _id: product.category._id,
-        name: product.category.name,
-        slug: product.category.slug,
-        isActive: product.category.isActive,
-      }
-    : null,
-  createdAt: product.createdAt,
-  updatedAt: product.updatedAt,
-});
+const shapeProduct = (product) => {
+  const images = Array.isArray(product.images) ? [...product.images] : [];
+  if (product.image && !images.includes(product.image)) {
+    images.unshift(product.image);
+  }
+
+  return {
+    _id: product._id,
+    name: product.name,
+    slug: product.slug,
+    description: product.description,
+    price: product.price,
+    images: images,
+    sizes: product.sizes,
+    colors: product.colors,
+    stockQuantity: product.stockQuantity,
+    isFeatured: product.isFeatured,
+    status: product.status,
+    category: product.category
+      ? {
+          _id: product.category._id,
+          name: product.category.name,
+          slug: product.category.slug,
+          isActive: product.category.isActive,
+        }
+      : null,
+    createdAt: product.createdAt,
+    updatedAt: product.updatedAt,
+  };
+};
 
 const shapeUser = (user) => ({
   _id: user._id,
@@ -446,17 +458,25 @@ export const createProduct = async (req, res) => {
     productRepository,
     req.body.slug?.trim() || req.body.name,
   );
-  const image = await resolveImageUpload({
-    file: req.file,
-    image: req.body.image,
+
+  const images = await resolveMultipleImagesUpload({
+    files: req.files || (req.file ? [req.file] : []),
+    images: req.body.images || req.body.image,
     folder: "trendcart/products",
   });
+
   const product = await productRepository.create({
     name: req.body.name.trim(),
     slug,
     description: req.body.description?.trim() || "",
     price: parseNumber(req.body.price),
-    image: image || "",
+    images: images,
+    sizes: Array.isArray(req.body.sizes)
+      ? req.body.sizes
+      : req.body.sizes?.split(",").map((s) => s.trim()) || [],
+    colors: Array.isArray(req.body.colors)
+      ? req.body.colors
+      : req.body.colors?.split(",").map((c) => c.trim()) || [],
     category: req.body.categoryId,
     stockQuantity: parseNumber(req.body.stockQuantity),
     isFeatured: parseBoolean(req.body.isFeatured, false),
@@ -496,21 +516,30 @@ export const updateProduct = async (req, res) => {
     req.body.slug?.trim() || req.body.name,
     req.params.id,
   );
-  const image = await resolveImageUpload({
-    file: req.file,
-    image: req.body.image,
+
+  const images = await resolveMultipleImagesUpload({
+    files: req.files || (req.file ? [req.file] : []),
+    images: req.body.images || req.body.image || existingProduct.images,
     folder: "trendcart/products",
   });
+
   const product = await productRepository.updateById(req.params.id, {
     name: req.body.name.trim(),
     slug,
     description: req.body.description?.trim() || "",
     price: parseNumber(req.body.price),
     category: req.body.categoryId,
+    images: images,
+    sizes: Array.isArray(req.body.sizes)
+      ? req.body.sizes
+      : req.body.sizes?.split(",").map((s) => s.trim()) || existingProduct.sizes,
+    colors: Array.isArray(req.body.colors)
+      ? req.body.colors
+      : req.body.colors?.split(",").map((c) => c.trim()) ||
+        existingProduct.colors,
     stockQuantity: parseNumber(req.body.stockQuantity),
     isFeatured: parseBoolean(req.body.isFeatured, existingProduct.isFeatured),
     status: req.body.status === "inactive" ? "inactive" : "active",
-    ...(image ? { image } : {}),
   });
 
   return res.status(200).json({

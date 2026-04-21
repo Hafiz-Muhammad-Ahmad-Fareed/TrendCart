@@ -16,22 +16,38 @@ const parseMultipartForm = async (req, res, next) => {
 
     req.body = {};
     req.file = null;
+    req.files = [];
 
     for (const [key, value] of formData.entries()) {
       if (typeof value === "string") {
-        req.body[key] = value;
+        if (req.body[key] === undefined) {
+          req.body[key] = value;
+        } else if (Array.isArray(req.body[key])) {
+          req.body[key].push(value);
+        } else {
+          req.body[key] = [req.body[key], value];
+        }
         continue;
+      }
+      const parsedFile = {
+        fieldname: key,
+        originalname: value.name,
+        mimetype: value.type,
+        size: value.size,
+        buffer: Buffer.from(await value.arrayBuffer()),
+      };
+
+      if (key === "images") {
+        req.files.push(parsedFile);
       }
 
       if (key === "image") {
-        req.file = {
-          fieldname: key,
-          originalname: value.name,
-          mimetype: value.type,
-          size: value.size,
-          buffer: Buffer.from(await value.arrayBuffer()),
-        };
+        req.file = parsedFile;
       }
+    }
+
+    if (!req.file && req.files.length > 0) {
+      req.file = req.files[0];
     }
 
     next();
