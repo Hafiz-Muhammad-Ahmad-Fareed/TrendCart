@@ -8,6 +8,7 @@ import {
   DollarSign,
   Calendar,
   Filter,
+  ChevronDown,
 } from "lucide-react";
 import {
   LineChart,
@@ -113,45 +114,61 @@ const AdminDashboardPage = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
-          <select
-            name="range"
-            value={filters.range}
-            onChange={handleFilterChange}
-            className="border border-gray-700 bg-gray-900/60 text-white text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5"
-          >
-            <option value="">Select Range</option>
-            <option value="7days">Last 7 Days</option>
-          </select>
+          <div className="relative">
+            <select
+              name="range"
+              value={filters.range}
+              onChange={handleFilterChange}
+              className="appearance-none border border-gray-700 bg-gray-900/60 py-2.5 pr-10 text-sm text-white rounded-lg outline-none focus:ring-emerald-500 focus:border-emerald-500 block p-2.5"
+            >
+              <option value="">Select Range</option>
+              <option value="7days">Last 7 Days</option>
+            </select>
+            <ChevronDown
+              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-400"
+              size={16}
+            />
+          </div>
 
           <div className="h-6 w-px bg-gray-700 hidden sm:block"></div>
-
-          <select
-            name="year"
-            value={filters.year}
-            onChange={handleFilterChange}
-            className="border border-gray-700 bg-gray-900/60 text-white text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5"
-          >
-            <option value="">Select Year</option>
-            {years.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-
-          <select
-            name="month"
-            value={filters.month}
-            onChange={handleFilterChange}
-            className="border border-gray-700 bg-gray-900/60 text-white text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5"
-          >
-            <option value="">Full Year</option>
-            {months.map((m) => (
-              <option key={m.value} value={m.value}>
-                {m.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              name="year"
+              value={filters.year}
+              onChange={handleFilterChange}
+              className="appearance-none border border-gray-700 bg-gray-900/60 py-2.5 text-sm text-white rounded-lg outline-none focus:ring-emerald-500 focus:border-emerald-500 block p-2.5"
+            >
+              <option value="">Select Year</option>
+              {years.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-400"
+              size={16}
+            />
+          </div>
+          <div className="relative">
+            <select
+              name="month"
+              value={filters.month}
+              onChange={handleFilterChange}
+              className="appearance-none border border-gray-700 bg-gray-900/60 py-2.5 pr-5 text-sm text-white rounded-lg outline-none focus:ring-emerald-500 focus:border-emerald-500 block p-2.5"
+            >
+              <option value="">Full Year</option>
+              {months.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-400"
+              size={16}
+            />
+          </div>
 
           {(filters.year || filters.month || filters.range) && (
             <button
