@@ -632,7 +632,7 @@ const AdminProductsPage = () => {
               {isProductsLoading ? (
                 <tr>
                   <td
-                    colSpan="4"
+                    colSpan="8"
                     className="px-6 py-20 text-center text-gray-400"
                   >
                     <div className="flex flex-col items-center gap-3">
