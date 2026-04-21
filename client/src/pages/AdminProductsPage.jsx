@@ -631,8 +631,14 @@ const AdminProductsPage = () => {
             <tbody className="text-sm divide-y divide-gray-800/50">
               {isProductsLoading ? (
                 <tr>
-                  <td colSpan="8" className="py-24 text-center text-gray-500">
-                    Loading catalog...
+                  <td
+                    colSpan="4"
+                    className="px-6 py-20 text-center text-gray-400"
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+                      Loading catalog...
+                    </div>
                   </td>
                 </tr>
               ) : filteredProducts.length === 0 ? (
