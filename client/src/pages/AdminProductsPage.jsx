@@ -628,7 +628,7 @@ const AdminProductsPage = () => {
                 <th className="px-6 py-4 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="text-sm divide-y divide-gray-800/50">
+            <tbody className="divide-y divide-gray-800/50">
               {isProductsLoading ? (
                 <tr>
                   <td
