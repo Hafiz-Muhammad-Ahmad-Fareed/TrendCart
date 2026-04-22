@@ -92,7 +92,7 @@ const ProductDetailsPage = () => {
     <div className="relative min-h-screen text-white">
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <Link
-          to={`/category/${currentProduct.category?.slug || ""}`}
+          to={`/categories/category/${currentProduct.category?.slug || ""}`}
           className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-emerald-300 transition hover:text-emerald-200"
         >
           <ArrowLeft size={16} />

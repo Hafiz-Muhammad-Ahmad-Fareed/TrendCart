@@ -18,6 +18,8 @@ import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./components/AdminLayout";
 import useUserStore from "./stores/useUserStore";
 import CategoriesPage from "./pages/CategoriesPage";
+import CategoriesLayout from "./pages/CategoriesLayout";
+import CategoryLayout from "./pages/CategoryLayout";
 
 function App() {
   const { userId, isLoaded } = useAuth();
@@ -59,12 +61,13 @@ function App() {
               )
             }
           />
-          <Route path="/categories" element={<CategoriesPage />} />
-          <Route path="/category/:slug" element={<CategoryPage />} />
-          <Route
-            path="/category/:slug/product/:slug"
-            element={<ProductDetailsPage />}
-          />
+          <Route path="/categories" element={<CategoriesLayout />}>
+            <Route index element={<CategoriesPage />} />
+            <Route path="category/:slug" element={<CategoryLayout />}>
+              <Route index element={<CategoryPage />} />
+              <Route path="product/:slug" element={<ProductDetailsPage />} />
+            </Route>
+          </Route>
           <Route path="/cart" element={<CartPage />} />
           <Route path="/orders" element={<OrdersPage />} />
           <Route path="/checkout-success" element={<CheckoutSuccessPage />} />
