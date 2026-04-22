@@ -5,6 +5,8 @@ import { useAuth } from "@clerk/react";
 import toast from "react-hot-toast";
 import useCatalogStore from "../stores/useCatalogStore";
 import useCartStore from "../stores/useCartStore";
+import ReviewSection from "../components/ReviewSection";
+import StarRating from "../components/StarRating";
 
 const ProductDetailsPage = () => {
   const { slug } = useParams();
@@ -145,9 +147,23 @@ const ProductDetailsPage = () => {
               <h1 className="mb-2 text-4xl font-bold text-white lg:text-5xl">
                 {currentProduct.name}
               </h1>
-              <span className="inline-block rounded-full bg-emerald-500/15 px-4 py-1.5 text-lg font-semibold text-emerald-300">
-                ${Number(currentProduct.price).toFixed(2)}
-              </span>
+              <div className="mb-4 flex items-center gap-4">
+                <span className="inline-block rounded-full bg-emerald-500/15 px-4 py-1.5 text-lg font-semibold text-emerald-300">
+                  ${Number(currentProduct.price).toFixed(2)}
+                </span>
+                {currentProduct.numReviews > 0 && (
+                  <div className="flex items-center gap-2">
+                    <StarRating
+                      rating={Math.round(currentProduct.averageRating)}
+                      readOnly
+                    />
+                    <span className="text-sm text-gray-400">
+                      ({currentProduct.numReviews}{" "}
+                      {currentProduct.numReviews === 1 ? "review" : "reviews"})
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -239,6 +255,9 @@ const ProductDetailsPage = () => {
             </button>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        <ReviewSection productId={currentProduct._id} />
 
         {/* Similar Products */}
         {similarProducts.length > 0 && (

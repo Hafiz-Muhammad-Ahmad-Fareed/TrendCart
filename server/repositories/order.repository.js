@@ -34,6 +34,14 @@ const orderRepository = {
   async findById(id) {
     return Order.findById(id).populate("user", "fullName email").lean();
   },
+  async hasPurchasedProduct(userId, productId) {
+    const order = await Order.findOne({
+      user: userId,
+      "items.product": productId,
+      paymentStatus: "paid",
+    });
+    return !!order;
+  },
 };
 
 export default orderRepository;

@@ -28,6 +28,8 @@ const shapeProduct = (product) => {
     stockQuantity: product.stockQuantity,
     isFeatured: product.isFeatured,
     status: product.status,
+    averageRating: product.averageRating || 0,
+    numReviews: product.numReviews || 0,
     category: product.category
       ? {
           _id: product.category._id,
