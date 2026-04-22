@@ -95,7 +95,7 @@ const useCartStore = create(
         set({ cart: [] });
       },
 
-      checkout: async () => {
+      checkout: async (guestEmail = null) => {
         const { cart } = get();
         if (cart.length === 0) {
           toast.error("Cart is empty");
@@ -111,6 +111,7 @@ const useCartStore = create(
               selectedColor: item.selectedColor,
               selectedImage: item.selectedImage,
             })),
+            guestEmail,
           });
           if (res.data.url) {
             window.location.href = res.data.url;

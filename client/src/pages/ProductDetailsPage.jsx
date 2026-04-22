@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ShoppingCart, Info, TrendingUp } from "lucide-react";
-import { useAuth } from "@clerk/react";
 import toast from "react-hot-toast";
 import useCatalogStore from "../stores/useCatalogStore";
 import useCartStore from "../stores/useCartStore";
@@ -10,7 +9,6 @@ import StarRating from "../components/StarRating";
 
 const ProductDetailsPage = () => {
   const { slug } = useParams();
-  const { isSignedIn } = useAuth();
   const {
     currentProduct,
     similarProducts,
@@ -37,11 +35,6 @@ const ProductDetailsPage = () => {
   }, [currentProduct]);
   // console.log(similarProducts);
   const handleAddToCart = () => {
-    if (!isSignedIn) {
-      toast.error("Please login to add to cart");
-      return;
-    }
-
     if (currentProduct.sizes?.length > 0 && !selectedSize) {
       toast.error("Please select a size");
       return;

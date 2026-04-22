@@ -12,7 +12,12 @@ export const createReview = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-  const review = await reviewService.createReview(user._id, productId, rating, comment);
+  const review = await reviewService.createReview(
+    user._id,
+    productId,
+    rating,
+    comment,
+  );
 
   return res
     .status(201)

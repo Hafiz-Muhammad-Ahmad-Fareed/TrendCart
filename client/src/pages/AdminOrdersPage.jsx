@@ -302,7 +302,9 @@ const AdminOrdersPage = () => {
                               {order.user?.fullName || "Guest User"}
                             </span>
                             <span className="text-xs text-gray-500">
-                              {order.user?.email || "No email"}
+                              {order.user?.email ||
+                                order?.guestEmail ||
+                                "No email"}
                             </span>
                           </div>
                         </div>

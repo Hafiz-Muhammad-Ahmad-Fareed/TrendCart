@@ -6,12 +6,24 @@ import productRepository from "../repositories/product.repository.js";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const createCheckoutSession = async (req, res) => {
-  const user = await userRepository.findByClerkId(req.user.id);
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
+  const { cartItems, guestEmail } = req.body;
+  const clerkId = req.auth?.userId;
+  let user = null;
+  let customerEmail = guestEmail;
+
+  if (clerkId) {
+    user = await userRepository.findByClerkId(clerkId);
+    if (user) {
+      customerEmail = user.email;
+    }
   }
 
-  const { cartItems } = req.body;
+  if (!customerEmail && !user) {
+    return res
+      .status(400)
+      .json({ message: "Email is required for guest checkout" });
+  }
+
   if (!cartItems || cartItems.length === 0) {
     return res.status(400).json({ message: "Cart is empty" });
   }
@@ -71,12 +83,14 @@ export const createCheckoutSession = async (req, res) => {
     mode: "payment",
     success_url: `${process.env.CLIENT_URL}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.CLIENT_URL}/cart`,
-    customer_email: user.email,
+    customer_email: customerEmail,
     shipping_address_collection: {
       allowed_countries: ["US", "CA", "GB"], // Adjust as needed
     },
     metadata: {
-      userId: user._id.toString(),
+      userId: user ? user._id.toString() : "",
+      isGuest: (!user).toString(),
+      guestEmail: !user ? customerEmail : "",
     },
   });
 
@@ -125,9 +139,12 @@ export const handleWebhook = async (req, res) => {
 
         if (!order) {
           const userId = session.metadata?.userId;
-          if (!userId) {
+          const isGuest = session.metadata?.isGuest === "true";
+          const guestEmail = session.metadata?.guestEmail;
+
+          if (!userId && !isGuest) {
             console.log(
-              `Unable to create order for session ${session.id}: missing userId metadata.`,
+              `Unable to create order for session ${session.id}: missing userId or isGuest metadata.`,
             );
             break;
           }
@@ -178,7 +195,9 @@ export const handleWebhook = async (req, res) => {
           );
 
           order = await orderRepository.create({
-            user: userId,
+            user: userId || null,
+            isGuest,
+            guestEmail,
             items: mappedItems,
             totalAmount: (session.amount_total || 0) / 100,
             stripeSessionId: session.id,

@@ -1,8 +1,19 @@
 import { Link } from "react-router-dom";
-import { ShoppingCart, Minus, Plus, Trash2, ArrowRight } from "lucide-react";
+import {
+  ShoppingCart,
+  Minus,
+  Plus,
+  Trash2,
+  ArrowRight,
+  Mail,
+} from "lucide-react";
+import { useAuth } from "@clerk/react";
+import { useState } from "react";
 import useCartStore from "../stores/useCartStore";
 
 const CartPage = () => {
+  const { isSignedIn } = useAuth();
+  const [guestEmail, setGuestEmail] = useState("");
   const { cart, updateQuantity, removeFromCart, isCartLoading, checkout } =
     useCartStore();
 
@@ -11,6 +22,14 @@ const CartPage = () => {
     (acc, item) => acc + item.product.price * item.quantity,
     0,
   );
+
+  const handleCheckout = (e) => {
+    e.preventDefault();
+    if (!isSignedIn && !guestEmail) {
+      return; // Handled by HTML required attribute
+    }
+    checkout(isSignedIn ? null : guestEmail);
+  };
 
   if (isCartLoading) {
     return (
@@ -60,9 +79,15 @@ const CartPage = () => {
                 >
                   {/* Product Image */}
                   <div className="h-32 w-full overflow-hidden rounded-2xl bg-gray-800 sm:h-24 sm:w-24">
-                    {item.selectedImage || item.product.images?.[0] || item.product.image ? (
+                    {item.selectedImage ||
+                    item.product.images?.[0] ||
+                    item.product.image ? (
                       <img
-                        src={item.selectedImage || item.product.images?.[0] || item.product.image}
+                        src={
+                          item.selectedImage ||
+                          item.product.images?.[0] ||
+                          item.product.image
+                        }
                         alt={item.product.name}
                         className="h-full w-full object-cover"
                       />
@@ -174,13 +199,40 @@ const CartPage = () => {
                 <span className="text-emerald-400">${subtotal.toFixed(2)}</span>
               </div>
 
-              <button
-                onClick={checkout}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-4 font-bold text-white transition hover:bg-emerald-500"
-              >
-                Proceed to Checkout
-                <ArrowRight size={20} />
-              </button>
+              <form onSubmit={handleCheckout} className="space-y-4">
+                {!isSignedIn && (
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-400"
+                    >
+                      Email for Guest Checkout
+                    </label>
+                    <div className="relative">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-500">
+                        <Mail size={18} />
+                      </div>
+                      <input
+                        type="email"
+                        id="email"
+                        value={guestEmail}
+                        onChange={(e) => setGuestEmail(e.target.value)}
+                        className="block w-full rounded-xl border border-gray-700 bg-gray-800/50 py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
+                        placeholder="your@email.com"
+                        required
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-4 font-bold text-white transition hover:bg-emerald-500"
+                >
+                  {isSignedIn ? "Proceed to Checkout" : "Checkout as Guest"}
+                  <ArrowRight size={20} />
+                </button>
+              </form>
 
               <Link
                 to="/"
