@@ -1,6 +1,13 @@
-import { useEffect } from "react";
-import { Users, Trash2, ShieldCheck, User as UserIcon } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import {
+  Users,
+  Trash2,
+  ShieldCheck,
+  User as UserIcon,
+  Search,
+} from "lucide-react";
 import useAdminStore from "../stores/useAdminStore";
+import SummaryCard from "../components/SummaryCard";
 
 const AdminUsersPage = () => {
   const {
@@ -13,9 +20,21 @@ const AdminUsersPage = () => {
     deleteUser,
   } = useAdminStore();
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  // Derived state: Filter users based on search term
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const name = (user.fullName || "").toLowerCase();
+      const email = (user.email || "").toLowerCase();
+      const search = searchTerm.toLowerCase();
+      return name.includes(search) || email.includes(search);
+    });
+  }, [users, searchTerm]);
 
   const handleToggleRole = async (user) => {
     const newRole = user.role === "admin" ? "user" : "admin";
@@ -38,13 +57,53 @@ const AdminUsersPage = () => {
     }
   };
 
+  const stats = [
+    {
+      label: "Total Users",
+      value: users.length,
+      icon: Users,
+      color: "from-purple-500 to-pink-600",
+    },
+  ];
+
   return (
     <div className="space-y-8">
       <div className="mb-6 flex items-center gap-3">
-        <div className="rounded-2xl bg-emerald-500/20 p-3 text-emerald-300">
+        <div className="rounded-2xl bg-blue-500/20 p-3 text-blue-400">
           <Users size={24} />
         </div>
         <h2 className="text-3xl font-bold">Manage Users</h2>
+      </div>
+
+      <div className="flex flex-col sm:items-center sm:flex-row justify-between">
+        {/* Stats */}
+        {stats.map((stat) => (
+          <div key={stat.label} className="w-full sm:w-64 mb-5 sm:mb-0">
+            <SummaryCard
+              title={stat.label}
+              value={stat.value}
+              icon={<stat.icon size={20} className="text-white" />}
+              color={stat.color}
+              bgColor="bg-gradient-to-r"
+              isLoading={isUsersLoading}
+            />
+          </div>
+        ))}
+
+        {/* Search Input */}
+        <div className="relative">
+          <Search
+            className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+            size={18}
+          />
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full rounded-xl border border-gray-700 bg-gray-900/60 py-2.5 pr-4 pl-10 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none sm:w-80"
+          />
+        </div>
       </div>
 
       <section className="rounded-3xl border border-gray-800 bg-gray-900/40 backdrop-blur-sm overflow-hidden">
@@ -72,17 +131,19 @@ const AdminUsersPage = () => {
                     </div>
                   </td>
                 </tr>
-              ) : users.length === 0 ? (
+              ) : filteredUsers.length === 0 ? (
                 <tr>
                   <td
                     colSpan="6"
                     className="px-6 py-20 text-center text-gray-400 italic"
                   >
-                    No user found.
+                    {searchTerm
+                      ? `No users found matching "${searchTerm}"`
+                      : "No users found."}
                   </td>
                 </tr>
               ) : (
-                users.map((user) => (
+                filteredUsers.map((user) => (
                   <tr key={user._id} className="group hover:bg-gray-800/30">
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
@@ -109,7 +170,7 @@ const AdminUsersPage = () => {
                     </td>
                     <td className="px-4 py-4 text-center">
                       <span
-                        className={` inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                           user.role === "admin"
                             ? "bg-emerald-500/15 text-emerald-300"
                             : "bg-blue-500/15 text-blue-300"

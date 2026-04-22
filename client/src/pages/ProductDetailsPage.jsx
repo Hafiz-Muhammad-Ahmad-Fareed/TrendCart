@@ -28,14 +28,12 @@ const ProductDetailsPage = () => {
 
   useEffect(() => {
     if (currentProduct) {
-      setMainImage(
-        currentProduct.images?.[0] || currentProduct.image || "",
-      );
+      setMainImage(currentProduct.images?.[0] || currentProduct.image || "");
       setSelectedSize("");
       setSelectedColor("");
     }
   }, [currentProduct]);
-
+  // console.log(similarProducts);
   const handleAddToCart = () => {
     if (!isSignedIn) {
       toast.error("Please login to add to cart");
@@ -56,7 +54,8 @@ const ProductDetailsPage = () => {
       ...currentProduct,
       selectedSize,
       selectedColor,
-      selectedImage: mainImage || currentProduct.images?.[0] || currentProduct.image || "",
+      selectedImage:
+        mainImage || currentProduct.images?.[0] || currentProduct.image || "",
     });
   };
 
@@ -223,11 +222,11 @@ const ProductDetailsPage = () => {
                   <span className="text-red-400">Out of Stock</span>
                 )}
               </div>
-              {currentProduct.isFeatured && (
+              {/* {currentProduct.isFeatured && (
                 <div className="rounded-full bg-amber-500/15 px-3 py-1 text-sm font-semibold text-amber-300">
                   Featured Product
                 </div>
-              )}
+              )} */}
             </div>
 
             <button
@@ -256,9 +255,9 @@ const ProductDetailsPage = () => {
                   className="group block overflow-hidden rounded-3xl border border-gray-800 bg-gray-900/50 transition hover:border-emerald-500/50"
                 >
                   <div className="aspect-square overflow-hidden bg-gray-800">
-                    {product.image ? (
+                    {product?.images ? (
                       <img
-                        src={product.image}
+                        src={product.images[0]}
                         alt={product.name}
                         className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
                       />

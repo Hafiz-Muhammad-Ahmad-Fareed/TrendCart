@@ -26,6 +26,7 @@ import {
   Legend,
 } from "recharts";
 import useAdminStore from "../stores/useAdminStore";
+import SummaryCard from "../components/SummaryCard";
 
 const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"];
 
@@ -89,16 +90,16 @@ const AdminDashboardPage = () => {
       color: "from-blue-500 to-indigo-600",
     },
     {
-      label: "Total Products",
-      value: counts.products,
-      icon: Package,
+      label: "Total Categories",
+      value: counts.categories,
+      icon: Tag,
       color: "from-emerald-500 to-teal-600",
     },
     {
-      label: "Total Users",
-      value: counts.users,
-      icon: Users,
-      color: "from-purple-500 to-pink-600",
+      label: "Total Products",
+      value: counts.products,
+      icon: Package,
+      color: "from-[#F76C2E] to-[#d45a22]",
     },
   ];
 
@@ -188,23 +189,36 @@ const AdminDashboardPage = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-6 mb-12 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 mb-10 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-xl border border-gray-700 bg-gray-800/50 p-6 backdrop-blur-md transition-all duration-300 hover:border-emerald-500/50"
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-sm font-medium text-gray-400">
-                {stat.label}
-              </h3>
-              <div className={`rounded-lg bg-gradient-to-r p-2 ${stat.color}`}>
-                <stat.icon size={20} className="text-white" />
+          <div>
+            {/* <div
+              key={stat.label}
+              className="rounded-xl border border-gray-700 bg-gray-800/50 p-6 backdrop-blur-md transition-all duration-300 hover:border-emerald-500/50"
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-sm font-medium text-gray-400">
+                  {stat.label}
+                </h3>
+                <div
+                  className={`rounded-lg bg-gradient-to-r p-2 ${stat.color}`}
+                >
+                  <stat.icon size={20} className="text-white" />
+                </div>
               </div>
-            </div>
-            <p className="text-3xl font-bold text-white">
-              {isDashboardLoading ? "..." : stat.value}
-            </p>
+              <p className="text-3xl font-bold text-white">
+                {isDashboardLoading ? "..." : stat.value}
+              </p>
+            </div> */}
+            <SummaryCard
+              key={stat.label}
+              title={stat.label}
+              value={stat.value}
+              icon={<stat.icon size={20} className="text-white" />}
+              color={stat.color}
+              bgColor="bg-gradient-to-r"
+              isLoading={isDashboardLoading}
+            />
           </div>
         ))}
       </div>

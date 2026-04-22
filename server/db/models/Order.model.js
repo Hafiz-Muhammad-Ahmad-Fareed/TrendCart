@@ -57,7 +57,7 @@ const orderSchema = new mongoose.Schema(
       default: "unpaid",
     },
     shippingAddress: {
-      type: Object, // Could be detailed later if needed
+      type: Object,
     },
   },
   { timestamps: true },

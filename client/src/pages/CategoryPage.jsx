@@ -89,11 +89,11 @@ const CategoryPage = () => {
 
                       <div className="flex items-center justify-between text-sm text-gray-400">
                         <span>Stock: {product.stockQuantity}</span>
-                        {product.isFeatured ? (
+                        {/* {product.isFeatured ? (
                           <span className="rounded-full bg-amber-500/15 px-3 py-1 font-semibold text-amber-300">
                             Featured
                           </span>
-                        ) : null}
+                        ) : null} */}
                       </div>
                     </div>
                   </Link>

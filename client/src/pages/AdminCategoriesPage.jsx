@@ -176,6 +176,7 @@ const AdminCategoriesPage = () => {
         />
       </div>
 
+      {/* Filters */}
       <div className="flex flex-col gap-3 sm:flex-row justify-between">
         <div className="relative">
           <Search

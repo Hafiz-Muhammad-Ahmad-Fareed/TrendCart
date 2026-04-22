@@ -32,10 +32,6 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "user"],
       default: "user",
     },
-    metadata: {
-      type: Object,
-      default: {},
-    },
   },
   { timestamps: true },
 );

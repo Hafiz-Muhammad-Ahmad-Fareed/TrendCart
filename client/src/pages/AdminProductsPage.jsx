@@ -699,8 +699,7 @@ const AdminProductsPage = () => {
                     </td>
                     <td className="px-6 py-5">
                       <span className="inline-flex items-center gap-2 rounded-xl bg-gray-800/50 px-3 py-1.5 text-xs font-semibold text-gray-300 border border-gray-700/50">
-                        <Layers size={14} />{" "}
-                        {p.category?.name || "Uncategorized"}
+                        <Tag size={14} /> {p.category?.name || "Uncategorized"}
                       </span>
                     </td>
                     <td className="px-6 py-5">
@@ -728,9 +727,9 @@ const AdminProductsPage = () => {
                             <div
                               key={c}
                               style={{ backgroundColor: c.toLowerCase() }}
-                              className="group rounded px-1"
+                              className="group rounded size-5 px-1"
                             >
-                              <span className="text-xs text-white">{c}</span>
+                              {/* <span className="text-xs text-white">{c}</span> */}
                             </div>
                           ))
                         ) : (
