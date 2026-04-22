@@ -32,6 +32,12 @@ const Navbar = () => {
                 >
                   Home
                 </Link>
+                <Link
+                  to="/categories"
+                  className="text-gray-300 transition duration-300 ease-in-out hover:text-emerald-400"
+                >
+                  Categories
+                </Link>
 
                 <Link
                   to="/cart"

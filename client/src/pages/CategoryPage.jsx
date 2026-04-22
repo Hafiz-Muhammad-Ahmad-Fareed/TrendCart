@@ -26,7 +26,7 @@ const CategoryPage = () => {
           className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-emerald-300 transition hover:text-emerald-200"
         >
           <ArrowLeft size={16} />
-          Back to categories
+          Back to Home
         </Link>
 
         {isCategoryProductsLoading ? (
@@ -51,7 +51,7 @@ const CategoryPage = () => {
                 {categoryProducts.map((product) => (
                   <Link
                     key={product._id}
-                    to={`/product/${product.slug}`}
+                    to={`/category/${currentCategory.slug}/product/${product.slug}`}
                     className="group overflow-hidden rounded-4xl border border-gray-800 bg-gray-900/70 shadow-2xl shadow-emerald-950/10 transition hover:border-emerald-500/50"
                   >
                     <div className="h-72 overflow-hidden bg-linear-to-br from-emerald-700/40 to-gray-950">
