@@ -271,7 +271,7 @@ const AdminCategoriesPage = () => {
                           <span className="text-sm font-medium text-white">
                             {category.name}
                           </span>
-                          <span className="text-xs text-gray-500 line-clamp-1 max-w-[250px]">
+                          <span className="text-xs text-gray-500 line-clamp-1 max-w-62.5">
                             {category.description}
                           </span>
                         </div>

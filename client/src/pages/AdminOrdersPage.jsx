@@ -367,7 +367,7 @@ const AdminOrdersPage = () => {
                                     className="flex items-center justify-between gap-4 py-2 border-b border-gray-800 last:border-0"
                                   >
                                     <div className="flex items-center gap-3">
-                                      <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-gray-800">
+                                      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-gray-800">
                                         {item.image ? (
                                           <img
                                             src={item.image}

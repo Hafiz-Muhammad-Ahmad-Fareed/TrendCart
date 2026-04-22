@@ -14,7 +14,7 @@ const CategoryItem = ({ category }) => {
               loading="lazy"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-emerald-800/60 to-gray-950 px-6 text-center text-3xl font-semibold text-white">
+            <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-emerald-800/60 to-gray-950 px-6 text-center text-3xl font-semibold text-white">
               {category.name}
             </div>
           )}
