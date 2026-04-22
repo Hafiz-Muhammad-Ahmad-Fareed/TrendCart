@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { ArrowLeft, Search, Filter, X } from "lucide-react";
+import { ArrowLeft, Search, Filter, X, ChevronDown } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import useCatalogStore from "../stores/useCatalogStore";
 
@@ -13,6 +13,7 @@ const CategoryPage = () => {
   } = useCatalogStore();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState("default");
 
   useEffect(() => {
     if (slug) {
@@ -21,13 +22,39 @@ const CategoryPage = () => {
   }, [fetchCategoryProducts, slug]);
 
   const filteredProducts = useMemo(() => {
-    return categoryProducts.filter((product) => {
-      const matchesSearch = product.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      return matchesSearch;
-    });
-  }, [categoryProducts, searchQuery]);
+    let result = [...categoryProducts];
+
+    if (searchQuery) {
+      result = result.filter((p) =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+    }
+
+    switch (activeFilter) {
+      case "price-low":
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case "price-high":
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case "under-100":
+        result = result.filter((p) => p.price < 100);
+        break;
+      case "under-500":
+        result = result.filter((p) => p.price < 500);
+        break;
+      case "under-1000":
+        result = result.filter((p) => p.price < 1000);
+        break;
+      case "latest":
+        result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        break;
+      default:
+        break;
+    }
+
+    return result;
+  }, [categoryProducts, searchQuery, activeFilter]);
 
   return (
     <div className="relative min-h-screen text-white">
@@ -42,8 +69,8 @@ const CategoryPage = () => {
           </Link>
         </div>
 
-        <div className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="relative col-span-1 md:col-span-1">
+        <div className="mb-10 flex items-center justify-end gap-4">
+          <div className="relative">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               size={18}
@@ -54,6 +81,29 @@ const CategoryPage = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full rounded-xl border border-gray-700 bg-gray-900/50 py-3 pl-10 pr-4 outline-none focus:border-emerald-500 transition-all"
+            />
+          </div>
+          <div className="flex items-center gap-2 relative">
+            <Filter
+              className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+              size={18}
+            />
+            <select
+              value={activeFilter}
+              onChange={(e) => setActiveFilter(e.target.value)}
+              className="appearance-none pl-10 text-white rounded-xl border border-gray-700 bg-gray-900/60 p-3 outline-none focus:border-emerald-500"
+            >
+              <option value="default">All Prices</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="under-100">Price: Under $100</option>
+              <option value="under-500">Price: Under $500</option>
+              <option value="under-1000">Price: Under $1000</option>
+              <option value="latest">Latest Arrivals</option>
+            </select>
+            <ChevronDown
+              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-400"
+              size={16}
             />
           </div>
         </div>
