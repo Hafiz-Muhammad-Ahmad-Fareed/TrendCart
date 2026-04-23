@@ -33,7 +33,6 @@ const ProductDetailsPage = () => {
       setSelectedColor("");
     }
   }, [currentProduct]);
-  // console.log(similarProducts);
   const handleAddToCart = () => {
     if (currentProduct.sizes?.length > 0 && !selectedSize) {
       toast.error("Please select a size");

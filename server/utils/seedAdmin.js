@@ -41,9 +41,5 @@ export default async function seedAdmin() {
       },
       { upsert: true, returnDocument: "after" },
     );
-
-    console.log("✅ Admin seeding complete.");
-  } catch (error) {
-    console.error("❌ Seeding failed:", error.message);
-  }
+  } catch (error) {}
 }

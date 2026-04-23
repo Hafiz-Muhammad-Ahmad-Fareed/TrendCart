@@ -18,7 +18,6 @@ const useUserStore = create((set) => ({
         set({ user: null, hasFetched: true });
       }
     } catch (err) {
-      console.log(err.message);
       set({ user: null, hasFetched: true });
     } finally {
       set({ isLoading: false });

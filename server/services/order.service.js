@@ -121,10 +121,8 @@ export const handleWebhook = async (req, res) => {
             expand: ["line_items.data.price.product"],
           },
         );
-        console.log(`Checkout session completed for session ID: ${session.id}`);
         let order = await orderRepository.findBySessionId(session.id);
         if (order?.paymentStatus === "paid") {
-          console.log(`Order ${order._id} is already marked as paid.`);
           break;
         }
 
@@ -143,9 +141,6 @@ export const handleWebhook = async (req, res) => {
           const guestEmail = session.metadata?.guestEmail;
 
           if (!userId && !isGuest) {
-            console.log(
-              `Unable to create order for session ${session.id}: missing userId or isGuest metadata.`,
-            );
             break;
           }
 
@@ -208,7 +203,6 @@ export const handleWebhook = async (req, res) => {
               ...shippingAddress,
             },
           });
-          console.log(`Order ${order._id} created from checkout session.`);
         } else {
           await orderRepository.updateById(order._id, {
             paymentStatus: "paid",
@@ -218,7 +212,6 @@ export const handleWebhook = async (req, res) => {
               ...shippingAddress,
             },
           });
-          console.log(`Order ${order._id} updated to paid.`);
         }
 
         for (const item of order.items || []) {
@@ -237,37 +230,30 @@ export const handleWebhook = async (req, res) => {
 
     case "charge.succeeded": {
       const charge = event.data.object;
-      console.log(`Charge succeeded for charge ID: ${charge.id}`);
       // If using checkout sessions, checkout.session.completed is usually enough.
       // But we can check if the order needs updating here as well if we have the session ID.
       if (charge.payment_intent) {
         // Payment Intent can be used to find the session if needed,
         // but Stripe Checkout sessions are easier to map via session.id
-        console.log(`Payment Intent ID: ${charge.payment_intent}`);
       }
       break;
     }
 
     case "payment_intent.succeeded": {
       const paymentIntent = event.data.object;
-      console.log(`Payment Intent succeeded for ID: ${paymentIntent.id}`);
       break;
     }
 
     case "payment_intent.created":
-      console.log(`Payment Intent created: ${event.data.object.id}`);
       break;
 
     case "payment_intent.requires_action":
-      console.log(`Payment Intent requires action: ${event.data.object.id}`);
       break;
 
     case "charge.updated":
-      console.log(`Charge updated: ${event.data.object.id}`);
       break;
 
     default:
-      console.log(`Received unhandled event type: ${event.type}`);
   }
 
   res.status(200).json({ received: true });

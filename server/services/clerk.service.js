@@ -123,12 +123,10 @@ export const clerkUserManagement = async (req, res) => {
         break;
 
       default:
-        console.log(`⚠️ Unhandled event type: ${eventType}`);
     }
 
     res.status(200).json({ success: true, message: "Event processed" });
   } catch (error) {
-    console.error("❌ Error processing webhook:", error);
     res.status(500).json({
       error: "Error processing webhook",
       details: error.message,
