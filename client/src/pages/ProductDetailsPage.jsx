@@ -263,7 +263,7 @@ const ProductDetailsPage = () => {
               {similarProducts.map((product) => (
                 <Link
                   key={product._id}
-                  to={`/product/${product.slug}`}
+                  to={`/categories/category/:slug/product/${product.slug}`}
                   className="group block overflow-hidden rounded-3xl border border-gray-800 bg-gray-900/50 transition hover:border-emerald-500/50"
                 >
                   <div className="aspect-square overflow-hidden bg-gray-800">
